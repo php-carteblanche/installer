@@ -101,12 +101,11 @@ class CarteBlancheInstaller
     public static function getPackageType(PackageInterface $package)
     {
         $type = $package->getType();
-        $name = $package->getName();
         if ($type===CarteBlancheConfig::CARTEBLANCHE_BUNDLETYPE) {
             return 'bundle';
         } elseif ($type===CarteBlancheConfig::CARTEBLANCHE_TOOLTYPE) {
             return 'tool';
-        } elseif ($name===CarteBlancheConfig::CARTEBLANCHE_CORE_NAME) {
+        } elseif ($type===CarteBlancheConfig::CARTEBLANCHE_CORETYPE) {
             return 'core';
         } else {
             return $type;
@@ -184,6 +183,8 @@ class CarteBlancheInstaller
             }
         } elseif ('bundle'===$type) {
             $base = $this->getBundleRootPath() . '/' . self::extractBundleShortName($package);
+        } else {
+            $base = parent::getPackageBasePath($package);
         }
         return $base;
     }

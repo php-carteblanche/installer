@@ -19,9 +19,9 @@ class CarteBlancheConfig
 {
 
     /**
-     * Core package name
+     * Core package type
      */
-    const CARTEBLANCHE_CORE_NAME = 'carte-blanche/core';
+    const CARTEBLANCHE_CORETYPE = 'carte-blanche-core';
 
     /**
      * Bundles package type
@@ -45,7 +45,9 @@ class CarteBlancheConfig
             // The default package type handles by the installer
             'package-type' => array(
                 'library-assets', 'library-assets-template',
-                self::CARTEBLANCHE_TOOLTYPE, self::CARTEBLANCHE_BUNDLETYPE
+                self::CARTEBLANCHE_CORETYPE,
+                self::CARTEBLANCHE_TOOLTYPE,
+                self::CARTEBLANCHE_BUNDLETYPE,
             ),
             // The default package vendor directory name (related to package root dir)
             'vendor-dir' => 'src/vendor',
