@@ -95,7 +95,7 @@ class CarteBlancheAutoloadGenerator
 
         $installer = CarteBlancheInstaller::getInstanciatedInstance();
         $type = $installer->getPackageType($package);
-        if (in_array($type, array('bundle', 'tool'))) {
+        if (in_array($type, array('bundle', 'tool')) || $package->getName()==='carte-blanche/core') {
             $cb_rel_path = $installer->getInstallPath($package);
 
             foreach (array('layouts_path', 'views_path', 'views_functions') as $entry) {

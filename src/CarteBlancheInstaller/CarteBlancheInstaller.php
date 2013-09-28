@@ -118,8 +118,8 @@ class CarteBlancheInstaller
      */
     public function getBundleRootPath()
     {
-        return (file_exists($this->vendorDir . '/atelierspierrot/carte-blanche/composer.json'))
-            ? $this->vendorDir . '/atelierspierrot/carte-blanche/src/bundles'
+        return (file_exists($this->vendorDir . '/carte-blanche/core/composer.json'))
+            ? $this->vendorDir . '/carte-blanche/core/src/bundles'
             : 'src/bundles';
     }
 
@@ -131,8 +131,8 @@ class CarteBlancheInstaller
      */
     public function getToolRootPath()
     {
-        return (file_exists($this->vendorDir . '/atelierspierrot/carte-blanche/composer.json'))
-            ? $this->vendorDir . '/atelierspierrot/carte-blanche/src/tools'
+        return (file_exists($this->vendorDir . '/carte-blanche/core/composer.json'))
+            ? $this->vendorDir . '/carte-blanche/core/src/tools'
             : 'src/tools';
     }
 
