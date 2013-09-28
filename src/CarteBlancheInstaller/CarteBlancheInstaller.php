@@ -230,6 +230,11 @@ class CarteBlancheInstaller
     {
         $type = self::getPackageType($package);
         if (in_array($type, array('bundle', 'tool', 'core'))) {
+
+
+echo PHP_EOL, 'installing package ', $package->getName(), ' of type ', $type, ' config? ', var_export($this->containsConfig($package),1);
+
+
             if ($this->containsAssets($package)) {
                 parent::install($repo, $package);
             } else {
