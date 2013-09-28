@@ -9,17 +9,17 @@
 
 namespace CarteBlancheInstaller;
 
-use Composer\Composer,
-    Composer\IO\IOInterface,
-    Composer\Autoload\AutoloadGenerator,
-    Composer\Package\PackageInterface,
-    Composer\Repository\RepositoryInterface,
-    Composer\Util\Filesystem,
-    Composer\Script\EventDispatcher;
+use \Composer\Composer,
+    \Composer\IO\IOInterface,
+    \Composer\Autoload\AutoloadGenerator,
+    \Composer\Package\PackageInterface,
+    \Composer\Repository\RepositoryInterface,
+    \Composer\Util\Filesystem,
+    \Composer\Script\EventDispatcher;
 
-use AssetsManager\Config;
+use \AssetsManager\Config;
 
-use CarteBlancheInstaller\CarteBlancheInstaller;
+use \CarteBlancheInstaller\CarteBlancheInstaller;
 
 /**
  * The application bootstrap generator

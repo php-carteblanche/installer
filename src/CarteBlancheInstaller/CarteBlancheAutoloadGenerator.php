@@ -9,22 +9,21 @@
 
 namespace CarteBlancheInstaller;
 
-use Composer\Composer,
-    Composer\IO\IOInterface,
-    Composer\Autoload\AutoloadGenerator,
-    Composer\Package\PackageInterface,
-    Composer\Repository\RepositoryInterface,
-    Composer\Script\Event,
-    Composer\Script\EventDispatcher;
+use \Composer\Composer,
+    \Composer\IO\IOInterface,
+    \Composer\Autoload\AutoloadGenerator,
+    \Composer\Package\PackageInterface,
+    \Composer\Repository\RepositoryInterface,
+    \Composer\Script\Event,
+    \Composer\Script\EventDispatcher;
 
-use AssetsManager\Error,
-    AssetsManager\Config;
+use \AssetsManager\Error,
+    \AssetsManager\Config,
+    \Assets\Composer\TemplateEngineAutoloadGenerator;
 
-use Assets\Composer\TemplateEngineAutoloadGenerator;
-
-use CarteBlancheInstaller\BootstrapGenerator,
-    CarteBlancheInstaller\CarteBlancheConfig,
-    CarteBlancheInstaller\CarteBlancheInstaller;
+use \CarteBlancheInstaller\BootstrapGenerator,
+    \CarteBlancheInstaller\CarteBlancheConfig,
+    \CarteBlancheInstaller\CarteBlancheInstaller;
 
 /**
  * The framework installer for bundles, tools and Composer events

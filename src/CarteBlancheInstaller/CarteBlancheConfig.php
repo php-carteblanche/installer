@@ -9,7 +9,7 @@
 
 namespace CarteBlancheInstaller;
 
-use AssetsManager\Config\DefaultConfig;
+use \AssetsManager\Config\DefaultConfig;
 
 /**
  * @author 		Piero Wbmstr <piero.wbmstr@gmail.com>

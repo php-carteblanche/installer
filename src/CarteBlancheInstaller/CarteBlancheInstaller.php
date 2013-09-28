@@ -12,21 +12,21 @@ namespace CarteBlancheInstaller;
 use \RecursiveDirectoryIterator,
     \RecursiveIteratorIterator;
 
-use Composer\Composer,
-    Composer\IO\IOInterface,
-    Composer\Installer\LibraryInstaller,
-    Composer\Package\PackageInterface,
-    Composer\Repository\InstalledRepositoryInterface,
-    Composer\Script\Event;
+use \Composer\Composer,
+    \Composer\IO\IOInterface,
+    \Composer\Installer\LibraryInstaller,
+    \Composer\Package\PackageInterface,
+    \Composer\Repository\InstalledRepositoryInterface,
+    \Composer\Script\Event;
 
-use AssetsManager\Composer\Installer\AssetsInstaller,
-    AssetsManager\Error,
-    AssetsManager\Config;
+use \AssetsManager\Composer\Installer\AssetsInstaller,
+    \AssetsManager\Error,
+    \AssetsManager\Config;
 
-use CarteBlancheInstaller\BootstrapGenerator,
-    CarteBlancheInstaller\CarteBlancheConfig,
-    CarteBlancheInstaller\CarteBlancheAutoloadGenerator,
-    CarteBlancheInstaller\Util\Filesystem;
+use \CarteBlancheInstaller\BootstrapGenerator,
+    \CarteBlancheInstaller\CarteBlancheConfig,
+    \CarteBlancheInstaller\CarteBlancheAutoloadGenerator,
+    \CarteBlancheInstaller\Util\Filesystem;
 
 
 /**
@@ -45,6 +45,18 @@ class CarteBlancheInstaller
      * @var self
      */
     protected static $_instanciatedInstance;
+
+    /**
+     * {@inheritDoc}
+     */
+    public function supports($packageType)
+    {
+        $types = Config::get('package-type');
+        $types = is_array($types) ? $types : array($types);
+var_export($types);
+var_export(in_array($packageType, $types));
+        return in_array($packageType, $types);
+    }
 
     /**
      */
