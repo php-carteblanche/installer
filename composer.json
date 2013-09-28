@@ -1,0 +1,32 @@
+{
+    "name": "carte-blanche/installer",
+    "type": "composer-installer",
+    "description": "A special Composer installer for the CarteBlanche framework to install Tools and Bundles.",
+    "keywords": ["carte blanche", "assets", "installer", "bundles", "tools"],
+    "homepage": "http://github.com/php-carteblanche/installer",
+    "version": "0.0.1-dev",
+    "license": "Apache-2.0",
+    "authors": [{
+        "name": "Les Ateliers Pierrot & contributors",
+        "email": "contact@ateliers-pierrot.fr",
+        "homepage": "http://www.ateliers-pierrot.fr/"
+    }],
+    "autoload": { "psr-0": { "CarteBlancheInstaller": "src/" } },
+    "require": {
+        "atelierspierrot/patterns": "dev-master",
+        "atelierspierrot/library": "dev-master",
+        "atelierspierrot/assets-manager": "dev-master",
+        "atelierspierrot/templatengine": "dev-master"
+    },
+    "require-dev": {
+        "composer/composer": "1.*@dev"
+    },
+    "extra": {
+        "class": "\\CarteBlancheInstaller\\CarteBlancheInstaller",
+        "assets-config-class": "\\CarteBlancheInstaller\\CarteBlancheConfig",
+        "assets-package-installer-class": "\\CarteBlancheInstaller\\CarteBlancheInstaller"
+    },
+    "scripts": {
+        "post-autoload-dump": "\\CarteBlancheInstaller\\CarteBlancheInstaller::postAutoloadDump"
+    }
+}
