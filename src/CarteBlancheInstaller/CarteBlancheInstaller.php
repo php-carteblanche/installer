@@ -136,32 +136,6 @@ var_export(in_array($packageType, $types));
     }
 
     /**
-     * Returns the root installation path for templates.
-     *
-     * @return string a path relative to the root of the composer.json that is being installed where the templates
-     *     are stored.
-     */
-    public function getBundleRootPath()
-    {
-        return (file_exists($this->vendorDir . '/carte-blanche/core/composer.json'))
-            ? $this->vendorDir . '/carte-blanche/core/src/bundles'
-            : 'src/bundles';
-    }
-
-    /**
-     * Returns the root installation path for templates.
-     *
-     * @return string a path relative to the root of the composer.json that is being installed where the templates
-     *     are stored.
-     */
-    public function getToolRootPath()
-    {
-        return (file_exists($this->vendorDir . '/carte-blanche/core/composer.json'))
-            ? $this->vendorDir . '/carte-blanche/core/src/tools'
-            : 'src/tools';
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getInstallPath(PackageInterface $package)
@@ -650,6 +624,17 @@ echo PHP_EOL,
 // ---------------------------
 
     /**
+     * Returns the root installation path for templates.
+     *
+     * @return string a path relative to the root of the composer.json that is being installed where the templates
+     *     are stored.
+     */
+    public function getBundleRootPath()
+    {
+        return 'src/bundles';
+    }
+
+    /**
      * Determines the install path for templates,
      *
      * The installation path is determined by checking whether the package is included in another composer configuration
@@ -700,6 +685,17 @@ echo PHP_EOL,
 // ---------------------------
 // Tools
 // ---------------------------
+
+    /**
+     * Returns the root installation path for templates.
+     *
+     * @return string a path relative to the root of the composer.json that is being installed where the templates
+     *     are stored.
+     */
+    public function getToolRootPath()
+    {
+        return 'src/tools';
+    }
 
     /**
      * Determines the install path for a package
