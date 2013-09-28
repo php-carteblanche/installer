@@ -97,7 +97,7 @@ class CarteBlancheAutoloadGenerator
         $type = $installer->getPackageType($package);
 
 
-echo PHP_EOL, $package->getName();
+echo PHP_EOL, $package->getName(), ' config? ', var_export($installer->getPackageConfigFiles($package),1);
 
         if (in_array($type, array('bundle', 'tool')) || $package->getName()==='carte-blanche/core') {
             $cb_rel_path = $installer->getInstallPath($package);
