@@ -19,6 +19,11 @@ class CarteBlancheConfig
 {
 
     /**
+     * Core package name
+     */
+    const CARTEBLANCHE_CORE_NAME = 'carte-blanche/core';
+
+    /**
      * Bundles package type
      */
     const CARTEBLANCHE_BUNDLETYPE = 'carte-blanche-bundle';

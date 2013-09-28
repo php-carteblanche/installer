@@ -101,10 +101,13 @@ class CarteBlancheInstaller
     public static function getPackageType(PackageInterface $package)
     {
         $type = $package->getType();
+        $name = $package->getName();
         if ($type===CarteBlancheConfig::CARTEBLANCHE_BUNDLETYPE) {
             return 'bundle';
         } elseif ($type===CarteBlancheConfig::CARTEBLANCHE_TOOLTYPE) {
             return 'tool';
+        } elseif ($name===CarteBlancheConfig::CARTEBLANCHE_CORE_NAME) {
+            return 'core';
         } else {
             return $type;
         }
@@ -163,7 +166,7 @@ class CarteBlancheInstaller
         $base = parent::getPackageBasePath($package);
         if ('tool'===$type) {
             $tool_name = self::extractToolShortName($package);
-            if ('all'===$tool_name) {
+            if ('defaults'===$tool_name) {
                 $base = $this->getToolRootPath();
             } else {
                 $base = $this->getToolRootPath() . '/' . $tool_name;
@@ -203,7 +206,7 @@ class CarteBlancheInstaller
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $type = self::getPackageType($package);
-        if (in_array($type, array('bundle', 'tool'))) {
+        if (in_array($type, array('bundle', 'tool', 'core'))) {
             if ($this->containsAssets($package)) {
                 $ok = parent::isInstalled($repo, $package);
                 if (!$ok) return $ok;
@@ -226,7 +229,7 @@ class CarteBlancheInstaller
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $type = self::getPackageType($package);
-        if (in_array($type, array('bundle', 'tool'))) {
+        if (in_array($type, array('bundle', 'tool', 'core'))) {
             if ($this->containsAssets($package)) {
                 parent::install($repo, $package);
             } else {
@@ -246,7 +249,7 @@ class CarteBlancheInstaller
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
         $type = self::getPackageType($initial);
-        if (in_array($type, array('bundle', 'tool'))) {
+        if (in_array($type, array('bundle', 'tool', 'core'))) {
             if ($this->containsConfig($initial)) {
                 $this->removeConfig($initial);
             }
@@ -269,7 +272,7 @@ class CarteBlancheInstaller
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $type = self::getPackageType($package);
-        if (in_array($type, array('bundle', 'tool'))) {
+        if (in_array($type, array('bundle', 'tool', 'core'))) {
             if ($this->containsConfig($package)) {
                 $this->removeConfig($package);
             }
@@ -290,7 +293,7 @@ class CarteBlancheInstaller
     {
         $type = self::getPackageType($package);
         $data = parent::parseComposerExtra($package, $package_dir);
-        if (!empty($data) && in_array($type, array('bundle', 'tool'))) {
+        if (!empty($data) && in_array($type, array('bundle', 'tool', 'core'))) {
             $data['carte_blanche_type'] = $type;
             $data['carte_blanche_path'] = $this->getInstallPath($package);
         }
