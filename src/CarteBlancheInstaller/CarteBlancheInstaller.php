@@ -93,7 +93,7 @@ class CarteBlancheInstaller
     }
 
     /**
-     * Get the object type by package type: `bundle`, `tool` or other
+     * Get the object type by package type: `bundle`, `tool`, `core` or other
      *
      * @param PackageInterface $package
      * @return string
@@ -111,6 +111,17 @@ class CarteBlancheInstaller
         } else {
             return $type;
         }
+    }
+
+    /**
+     * Test if the class must handle the package by its type
+     *
+     * @param string $type
+     * @return bool
+     */
+    public static function mustHandlePackageType($type)
+    {
+        return in_array($type, array('bundle', 'tool', 'core'));
     }
 
     /**
@@ -206,7 +217,7 @@ class CarteBlancheInstaller
     public function isInstalled(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $type = self::getPackageType($package);
-        if (in_array($type, array('bundle', 'tool', 'core'))) {
+        if (self::mustHandlePackageType($type)) {
             if ($this->containsAssets($package)) {
                 $ok = parent::isInstalled($repo, $package);
                 if (!$ok) return $ok;
@@ -229,12 +240,15 @@ class CarteBlancheInstaller
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $type = self::getPackageType($package);
-        if (in_array($type, array('bundle', 'tool', 'core'))) {
 
+echo PHP_EOL,
+    'installing package ', $package->getName(),
+    ' of type ', $type,
+    ' mustHandle? ', var_export(self::mustHandlePackageType($type),1),
+    ' config? ', var_export($this->containsConfig($package),1)
+    ;
 
-echo PHP_EOL, 'installing package ', $package->getName(), ' of type ', $type, ' config? ', var_export($this->containsConfig($package),1);
-
-
+        if (self::mustHandlePackageType($type)) {
             if ($this->containsAssets($package)) {
                 parent::install($repo, $package);
             } else {
@@ -254,7 +268,7 @@ echo PHP_EOL, 'installing package ', $package->getName(), ' of type ', $type, ' 
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
         $type = self::getPackageType($initial);
-        if (in_array($type, array('bundle', 'tool', 'core'))) {
+        if (self::mustHandlePackageType($type)) {
             if ($this->containsConfig($initial)) {
                 $this->removeConfig($initial);
             }
@@ -277,7 +291,7 @@ echo PHP_EOL, 'installing package ', $package->getName(), ' of type ', $type, ' 
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $type = self::getPackageType($package);
-        if (in_array($type, array('bundle', 'tool', 'core'))) {
+        if (self::mustHandlePackageType($type)) {
             if ($this->containsConfig($package)) {
                 $this->removeConfig($package);
             }
@@ -298,7 +312,7 @@ echo PHP_EOL, 'installing package ', $package->getName(), ' of type ', $type, ' 
     {
         $type = self::getPackageType($package);
         $data = parent::parseComposerExtra($package, $package_dir);
-        if (!empty($data) && in_array($type, array('bundle', 'tool', 'core'))) {
+        if (!empty($data) && self::mustHandlePackageType($type)) {
             $data['carte_blanche_type'] = $type;
             $data['carte_blanche_path'] = $this->getInstallPath($package);
         }
