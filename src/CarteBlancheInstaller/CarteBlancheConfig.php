@@ -104,7 +104,7 @@ class CarteBlancheConfig
             // list of config files from package's root
             'carte-blanche-configs' => null,
             // relative language files directory from root
-            'i18n-dir' => 'i18n',
+            'i18n-dir' => 'config/i18n',
             // relative vendor language files directory from config directory
             'i18n-vendor-dir' => 'vendor',
             // list of language files from package's root
