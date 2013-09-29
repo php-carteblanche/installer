@@ -41,6 +41,9 @@ class CarteBlancheInstaller
     protected $config_dir;
     protected $config_vendor_dir;
 
+    protected $i18n_dir;
+    protected $i18n_vendor_dir;
+
     /**
      * @var self
      */
@@ -182,6 +185,16 @@ class CarteBlancheInstaller
         return (!empty($extra) && array_key_exists('config-dir', $extra)) || (!empty($config_file));
     }
 
+    /**
+     * @return bool
+     */
+    public static function containsLanguages(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+        $ln_file = self::guessLanguageFiles($package);
+        return (!empty($extra) && array_key_exists('i18n-dir', $extra)) || (!empty($ln_file));
+    }
+
 // ---------------------------
 // Assets Installer
 // ---------------------------
@@ -203,6 +216,9 @@ class CarteBlancheInstaller
             if ($this->containsConfig($package)) {
                 $ok = $this->isInstalledConfig($package);
             }
+            if ($this->containsLanguages($package)) {
+                $ok = $this->isInstalledLanguage($package);
+            }
             return $ok;
         } else {
             return parent::isInstalled($repo, $package);
@@ -223,6 +239,9 @@ class CarteBlancheInstaller
             }
             if ($this->containsConfig($package)) {
                 $this->installConfig($package);
+            }
+            if ($this->containsLanguages($package)) {
+                $this->installLanguage($package);
             }
         } else {
             return parent::install($repo, $package);
@@ -247,6 +266,9 @@ class CarteBlancheInstaller
             if ($this->containsConfig($target)) {
                 $this->installConfig($target);
             }
+            if ($this->containsLanguages($target)) {
+                $this->installLanguage($target);
+            }
         } else {
             return parent::update($repo, $initial, $target);
         }
@@ -261,6 +283,9 @@ class CarteBlancheInstaller
         if (self::mustHandlePackageType($type)) {
             if ($this->containsConfig($package)) {
                 $this->removeConfig($package);
+            }
+            if ($this->containsLanguages($package)) {
+                $this->removeLanguage($package);
             }
             if ($this->containsAssets($package)) {
                 return parent::uninstall($repo, $package);
@@ -589,6 +614,319 @@ class CarteBlancheInstaller
         $return = false;
         foreach ($config_files as $config) {
             $link = $this->config_vendor_dir.'/'.basename($config);
+            if (is_link($link) || file_exists($link)) {
+                $return = unlink($link);
+            }
+            if (file_exists($link.'.bat')) {
+                $return = unlink($link.'.bat');
+            }
+        }
+        return $return;
+    }
+
+// ---------------------------
+// Language files
+// ---------------------------
+
+    public static function guessLanguageDir(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+        return isset($extra['i18n-dir']) ? $extra['i18n-dir'] : Config::get('i18n-dir');
+    }
+
+    public static function guessLanguageVendorDir(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+        return isset($extra['i18n-vendor-dir']) ? $extra['i18n-vendor-dir'] : Config::get('i18n-vendor-dir');
+    }
+
+    public static function guessLanguageFiles(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+        return isset($extra['carte-blanche-i18n']) ? $extra['carte-blanche-i18n'] : Config::get('carte-blanche-i18n');
+    }
+
+    protected function getLanguageDir()
+    {
+        $this->initializeLanguageDir();
+        return $this->i18n_dir;
+    }
+
+    protected function getLanguageVendorDir()
+    {
+        $this->initializeLanguageVendorDir();
+        return $this->i18n_vendor_dir;
+    }
+
+    protected function initializeLanguageDir()
+    {
+        $this->filesystem->ensureDirectoryExists($this->i18n_dir);
+        $this->i18n_dir = realpath($this->i18n_dir);
+    }
+
+    protected function initializeLanguageVendorDir()
+    {
+        $path = $this->getLanguageDir() . '/' . (
+            $this->i18n_vendor_dir ? str_replace($this->getLanguageDir(), '', $this->i18n_vendor_dir) : ''
+        );
+        $this->filesystem->ensureDirectoryExists($path);
+        $this->i18n_vendor_dir = realpath($path);
+    }
+
+    public function getLanguageInstallPath(PackageInterface $package)
+    {
+        return $this->getLanguageVendorDir();
+    }
+
+    public function getRootPackageLanguageFiles(PackageInterface $package)
+    {
+        $package_i18n_files = array();
+        $i18n_files = $this->guessLanguageFiles($package);
+        if (empty($i18n_files)) {
+            return array();
+        }
+        if (!empty($i18n_files) && !is_array($i18n_files)) {
+            $i18n_files = array($i18n_files);
+        }
+        $base_path = rtrim($this->getAppBasePath(), '/') . DIRECTORY_SEPARATOR;
+
+        if (!empty($i18n_files)) {
+            foreach ($i18n_files as $file) {
+                $from_file = $base_path . $file;
+                if (file_exists($from_file)) {
+                    $package_i18n_files[] = $from_file;
+                } else {
+                    $this->io->write( 
+                        sprintf('Skipping language file <info>%s</info> from package <info>%s</info>: file not found!', 
+                            str_replace(dirname($this->i18n_dir) . '/', '', $from_file),
+                            $package->getPrettyName()
+                        )
+                    );
+                }
+            }
+        }
+
+        return $package_i18n_files;
+    }
+    
+    public function getPackageLanguageFiles(PackageInterface $package)
+    {
+        $package_i18n_files = array();
+        $i18n_files = $this->guessLanguageFiles($package);
+        $i18n_dir = $this->guessLanguageDir($package);
+        if (empty($i18n_dir) && empty($i18n_files)) {
+            return array();
+        }
+        if (!empty($i18n_files) && !is_array($i18n_files)) {
+            $i18n_files = array($i18n_files);
+        }
+        $base_path = rtrim($this->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR;
+
+        if (!empty($i18n_files)) {
+            foreach ($i18n_files as $file) {
+                $from_file = $base_path . $file;
+                if (file_exists($from_file)) {
+                    $package_i18n_files[] = $from_file;
+                } else {
+                    $this->io->write( 
+                        sprintf('Skipping language file <info>%s</info> from package <info>%s</info>: file not found!', 
+                            str_replace(dirname($this->i18n_dir) . '/', '', $from_file),
+                            $package->getPrettyName()
+                        )
+                    );
+                }
+            }
+        }
+
+        if (!empty($i18n_dir)) {
+            $i18n_dir_path = $base_path . $i18n_dir;
+            if (file_exists($i18n_dir_path)) {
+                $it = new RecursiveDirectoryIterator($i18n_dir_path, RecursiveDirectoryIterator::SKIP_DOTS);
+                $ri = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
+                foreach ($ri as $file) {
+                    if (!in_array($file->getPathname(), $package_i18n_files)) {
+                        if ($file->isFile()) {
+                            $package_i18n_files[] = $file->getPathname();
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $package_i18n_files;
+    }
+
+    /**
+     * Test if i18n files of a package already exists
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    protected function isInstalledLanguage(PackageInterface $package)
+    {
+        $from_files = $this->getPackageLanguageFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getLanguageInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $return = false;
+        foreach ($from_files as $i18n) {
+            if (file_exists($i18n)) {
+                $link = $this->i18n_vendor_dir.'/'.basename($i18n);
+                $return = file_exists($link);
+            }
+        }
+        return $return;
+    }
+
+    /**
+     * Move the i18n files of a package
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    protected function installLanguage(PackageInterface $package)
+    {
+        $from_files = $this->getPackageLanguageFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getLanguageInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $package_base_path = rtrim($this->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR;
+        $this->io->write( 
+            sprintf('  - Installing <info>%s</info> language files to <info>%s</info>', 
+                $package->getPrettyName(),
+                str_replace(dirname($this->i18n_dir) . '/', '', $target)
+            )
+        );
+        $return = $this->doInstallLanguage($from_files, $target);
+        $this->io->write('');
+        return $return;
+    }
+
+    /**
+     * Remove the i18n files of a package
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    protected function removeLanguage(PackageInterface $package)
+    {
+        $from_files = $this->getPackageLanguageFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getLanguageInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $this->io->write( 
+            sprintf('  - Removing <info>%s</info> language files from <info>%s</info>', 
+                $package->getPrettyName(),
+                str_replace(dirname($this->i18n_dir) . '/', '', $target)
+            )
+        );
+        $return = $this->doRemoveLanguage($from_files);
+        $this->io->write('');
+        return $return;
+    }
+
+    /**
+     * Move the i18n files of the root package
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    public function installRootLanguage(PackageInterface $package)
+    {
+        $from_files = $this->getRootPackageLanguageFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getLanguageInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $this->io->write( 
+            sprintf('  - Installing <info>%s</info> language files to <info>%s</info>', 
+                $package->getPrettyName(),
+                str_replace(dirname($this->i18n_dir) . '/', '', $target)
+            )
+        );
+        $return = $this->doInstallLanguage($from_files, $target);
+        $this->io->write('');
+        return $return;
+    }
+
+    /**
+     * Remove the i18n files of the root package
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    public function removeRootLanguage(PackageInterface $package)
+    {
+        $from_files = $this->getRootPackageLanguageFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getLanguageInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $this->io->write( 
+            sprintf('  - Removing <info>%s</info> language files from <info>%s</info>', 
+                $package->getPrettyName(),
+                str_replace(dirname($this->i18n_dir) . '/', '', $target)
+            )
+        );
+        $return = $this->doRemoveLanguage($from_files);
+        $this->io->write('');
+        return $return;
+    }
+
+    /**
+     * Actually process the i18n links/files isntallation
+     * @param array $i18n_files
+     * @param string $target
+     * @return bool
+     */
+    protected function doInstallLanguage(array $i18n_files, $target)
+    {
+        $app_base_path = rtrim($this->getAppBasePath(), '/') . DIRECTORY_SEPARATOR;
+        $return = false;
+        foreach ($i18n_files as $i18n) {
+            if (!file_exists($i18n)) {
+                $this->io->write('    <warning>Skipped installation of '.basename($i18n).': file not found in package</warning>');
+                continue;
+            }
+            $link = $this->i18n_vendor_dir.'/'.basename($i18n);
+            if (file_exists($link)) {
+                if (is_link($link)) {
+                    chmod($link, 0777 & ~umask());
+                }
+                $this->io->write('    Skipped installation of '.basename($i18n).': name conflicts with an existing file');
+                continue;
+            }
+            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+                $return = $this->filesystem->copyFiles($i18n, $target);
+            } else {
+                $cwd = getcwd();
+                try {
+                    $relativeLanguage = $this->filesystem->findShortestPath($link, $app_base_path . str_replace($app_base_path, '', $i18n));
+                    chdir(dirname($link));
+                    $return = symlink($relativeLanguage, $link);
+                } catch (\ErrorException $e) {
+                    $return = $this->filesystem->copyFiles($i18n, $target);
+                }
+                chdir($cwd);
+            }
+            chmod($link, 0777 & ~umask());
+        }
+        return $return;
+    }
+
+    /**
+     * Actually process the i18n links/files removing
+     * @param array $i18n_files
+     * @return bool
+     */
+    protected function doRemoveLanguage(array $i18n_files)
+    {
+        $return = false;
+        foreach ($i18n_files as $i18n) {
+            $link = $this->i18n_vendor_dir.'/'.basename($i18n);
             if (is_link($link) || file_exists($link)) {
                 $return = unlink($link);
             }

@@ -94,15 +94,21 @@ class CarteBlancheConfig
             // relative views from root-dir
             'views' => 'src/CarteBlanche/views',
             // relative views functions from root-dir
-            'views-functions' => 'src/CarteBlanche/views_aliases.php',
+            'views-functions' => 'src/views_aliases.php',
             
 // Carte Blanche
             // relative config files directory from root
             'config-dir' => 'config',
             // relative vendor config files directory from config directory
             'config-vendor-dir' => 'vendor',
-            // relative config single files from root
+            // list of config files from package's root
             'carte-blanche-configs' => null,
+            // relative language files directory from root
+            'i18n-dir' => 'i18n',
+            // relative vendor language files directory from config directory
+            'i18n-vendor-dir' => 'vendor',
+            // list of language files from package's root
+            'carte-blanche-i18n' => null,
             // relative var files directory from root
             'var-dir' => 'var',
             // relative bundles directory from root
