@@ -47,22 +47,6 @@ class CarteBlancheInstaller
     protected static $_instanciatedInstance;
 
     /**
-     * {@inheritDoc}
-     */
-    public function supports($packageType)
-    {
-        $types = Config::get('package-type');
-        $types = is_array($types) ? $types : array($types);
-
-echo PHP_EOL,
-    'analyzing type ', $packageType,
-    ' | must handle types ', var_export($types,1),
-    ' | must handle this? ', var_export(in_array($packageType, $types),1)
-    ;
-        return in_array($packageType, $types);
-    }
-
-    /**
      */
     public static function postAutoloadDump(Event $event)
     {
@@ -231,14 +215,6 @@ echo PHP_EOL,
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $type = self::getPackageType($package);
-
-echo PHP_EOL,
-    'installing package ', $package->getName(),
-    ' of type ', $type,
-    ' mustHandle? ', var_export(self::mustHandlePackageType($type),1),
-    ' config? ', var_export($this->containsConfig($package),1)
-    ;
-
         if (self::mustHandlePackageType($type)) {
             if ($this->containsAssets($package)) {
                 parent::install($repo, $package);
