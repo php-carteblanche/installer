@@ -53,8 +53,12 @@ class CarteBlancheInstaller
     {
         $types = Config::get('package-type');
         $types = is_array($types) ? $types : array($types);
-var_export($types);
-var_export(in_array($packageType, $types));
+
+echo PHP_EOL,
+    'analyzing type ', $packageType,
+    ' | must handle types ', var_export($types,1),
+    ' | must handle this? ', var_export(in_array($packageType, $types),1)
+    ;
         return in_array($packageType, $types);
     }
 
