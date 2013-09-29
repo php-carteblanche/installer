@@ -80,6 +80,8 @@ class CarteBlancheInstaller
 
         $this->config_dir = $this->guessConfigDir($composer->getPackage());
         $this->config_vendor_dir = $this->guessConfigVendorDir($composer->getPackage());
+        $this->i18n_dir = $this->guessLanguageDir($composer->getPackage());
+        $this->i18n_vendor_dir = $this->guessLanguageVendorDir($composer->getPackage());
         $this->filesystem->ensureDirectoryExists(Config::get('bundle-dir'));
         $this->filesystem->ensureDirectoryExists(Config::get('tool-dir'));
         $this->filesystem->ensureDirectoryExists(Config::get('var-dir'));
