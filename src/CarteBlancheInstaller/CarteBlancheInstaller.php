@@ -1040,7 +1040,7 @@ class CarteBlancheInstaller
             );
         }
         $tool_name = self::extractToolShortName($package);
-        if ('all'===$tool_name) {
+        if (in_array($tool_name, array('all', 'defaults'))) {
             return $this->getToolRootPath();
         } else {
             return $this->getToolRootPath() . '/' . $tool_name;
