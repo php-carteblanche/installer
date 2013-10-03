@@ -138,6 +138,8 @@ class CarteBlancheInstaller
             return $this->getBundleInstallPath($package);
         } elseif ('tool'===$type) {
             return $this->getToolInstallPath($package);
+        } elseif ('core'===$type) {
+            return $this->getCoreInstallPath($package);
         } else {
             return parent::getInstallPath($package);
         }
@@ -940,11 +942,34 @@ class CarteBlancheInstaller
     }
 
 // ---------------------------
+// Core
+// ---------------------------
+
+    /**
+     * Returns the root installation path for the core
+     *
+     * @return string a path relative to the root of the composer.json that is being installed where the templates
+     *     are stored.
+     */
+    public function getCoreRootPath()
+    {
+        return 'src/vendor';
+    }
+
+    /**
+     * Determines the install path for CarteBlanche core
+     */
+    public function getCoreInstallPath(PackageInterface $package)
+    {
+        return $this->getCoreRootPath() . '/' . $package->getPrettyName();
+    }
+
+// ---------------------------
 // Bundles
 // ---------------------------
 
     /**
-     * Returns the root installation path for templates.
+     * Returns the root installation path for bundles
      *
      * @return string a path relative to the root of the composer.json that is being installed where the templates
      *     are stored.
@@ -955,7 +980,7 @@ class CarteBlancheInstaller
     }
 
     /**
-     * Determines the install path for templates,
+     * Determines the install path for bundles
      *
      * The installation path is determined by checking whether the package is included in another composer configuration
      * or installed as part of the normal CarteBlanche installation.
