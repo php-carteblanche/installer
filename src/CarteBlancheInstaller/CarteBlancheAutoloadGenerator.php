@@ -139,11 +139,13 @@ class CarteBlancheAutoloadGenerator
         if (is_null($data)) $data = array();
 
         $installer = CarteBlancheInstaller::getInstanciatedInstance();
-        $cb_rel_path = $installer->getInstallPath($package);
+        $vendor_package_dir = $installer->getAppBasePath();
+        $cb_path = $installer->getInstallPath($package);
 
+        $cb_rel_path = str_replace($vendor_package_dir, '', $cb_path);
         foreach (array('layouts_path', 'views_path', 'views_functions') as $entry) {
             if (isset($data[$entry])) {
-                $data[$entry] = str_replace($vendor_package_dir, $cb_rel_path, $data[$entry]);
+                $data[$entry] = str_replace($cb_path, $cb_rel_path, $data[$entry]);
             }
         }
         

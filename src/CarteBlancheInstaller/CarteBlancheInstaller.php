@@ -961,7 +961,7 @@ class CarteBlancheInstaller
      */
     public function getCoreInstallPath(PackageInterface $package)
     {
-        return $this->getCoreRootPath() . '/' . $package->getPrettyName();
+        return realpath($this->getCoreRootPath()) . '/' . $package->getPrettyName();
     }
 
 // ---------------------------
