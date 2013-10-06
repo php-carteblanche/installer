@@ -26,9 +26,9 @@
     "extra": {
         "class": "\\CarteBlancheInstaller\\CarteBlancheInstaller",
         "assets-config-class": "\\CarteBlancheInstaller\\CarteBlancheConfig",
-        "assets-package-installer-class": "\\CarteBlancheInstaller\\CarteBlancheInstaller"
+        "assets-package-installer-class": "\\CarteBlancheInstaller\\CarteBlancheInstaller",
         "branch-alias": {
-            "dev-master": "0.1"
+            "dev-master": "0.1-dev"
         }
     }
 }
