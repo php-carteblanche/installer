@@ -103,15 +103,15 @@ class CarteBlancheAutoloadGenerator
                 }
             }
             
-            if ($installer->containsAssets($package)) {
+            if ($installer->isPackageContains($package, 'assets-dir')) {
                 $data['relative_path'] = str_replace(
                     $installer->getAssetsVendorDir() . '/', '', $installer->getAssetsInstallPath($package));
             }
 
-            if ($installer->containsConfig($package)) {
+            if ($installer->isPackageContains($package, 'config-dir', 'carte-blanche-configs')) {
                 $files = $installer->getPackageConfigFiles($package);
                 $base_from = rtrim($installer->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR
-                    . rtrim($installer->guessConfigDir($package), '/') . DIRECTORY_SEPARATOR;
+                    . rtrim($installer->guessConfigurationEntry($package, 'config-dir'), '/') . DIRECTORY_SEPARATOR;
                 if (!empty($files)) {
                     foreach ($files as $i=>$file) {
                         $files[$i] = str_replace($base_from, '', $file);
@@ -149,12 +149,12 @@ class CarteBlancheAutoloadGenerator
             }
         }
         
-        if ($installer->containsAssets($package)) {
+        if ($installer->isPackageContains($package, 'assets-dir')) {
             $data['relative_path'] = str_replace(
                 $installer->getAssetsVendorDir() . '/', '', $installer->getAssetsInstallPath($package));
         }
 
-        if ($installer->containsConfig($package)) {
+        if ($installer->isPackageContains($package, 'config-dir', 'carte-blanche-configs')) {
             $files = $installer->getRootPackageConfigFiles($package);
             if (!empty($files)) {
                 $installer->installRootConfig($package);

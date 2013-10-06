@@ -44,6 +44,8 @@ class CarteBlancheInstaller
     protected $i18n_dir;
     protected $i18n_vendor_dir;
 
+    protected $doc_dir;
+
     /**
      * @var self
      */
@@ -78,10 +80,11 @@ class CarteBlancheInstaller
         parent::__construct($io, $composer, $type);
         $this->filesystem = new Filesystem;
 
-        $this->config_dir = $this->guessConfigDir($composer->getPackage());
-        $this->config_vendor_dir = $this->guessConfigVendorDir($composer->getPackage());
-        $this->i18n_dir = $this->guessLanguageDir($composer->getPackage());
-        $this->i18n_vendor_dir = $this->guessLanguageVendorDir($composer->getPackage());
+        $this->doc_dir = $this->guessConfigurationEntry($composer->getPackage(), 'doc-dir');
+        $this->config_dir = $this->guessConfigurationEntry($composer->getPackage(), 'config-dir');
+        $this->config_vendor_dir = $this->guessConfigurationEntry($composer->getPackage(), 'config-vendor-dir');
+        $this->i18n_dir = $this->guessConfigurationEntry($composer->getPackage(), 'i18n-dir');
+        $this->i18n_vendor_dir = $this->guessConfigurationEntry($composer->getPackage(), 'i18n-vendor-dir');
         $this->filesystem->ensureDirectoryExists(Config::get('bundle-dir'));
         $this->filesystem->ensureDirectoryExists(Config::get('tool-dir'));
         $this->filesystem->ensureDirectoryExists(Config::get('var-dir'));
@@ -156,58 +159,20 @@ class CarteBlancheInstaller
         $type = self::getPackageType($package);
         $base = parent::getPackageBasePath($package);
         if ('tool'===$type) {
-            $tool_name = self::extractToolShortName($package);
+            $tool_name = self::extractShortName($package, 'tool-name');
             if ('defaults'===$tool_name) {
                 $base = $this->getToolRootPath();
             } else {
                 $base = $this->getToolRootPath() . '/' . $tool_name;
             }
         } elseif ('bundle'===$type) {
-            $base = $this->getBundleRootPath() . '/' . self::extractBundleShortName($package);
+            $base = $this->getBundleRootPath() . '/' . self::extractShortName($package, 'bundle-name');
         } else {
             $base = parent::getPackageBasePath($package);
         }
         return $base;
     }
         
-    /**
-     * @return bool
-     */
-    public static function containsAssets(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return !empty($extra) && array_key_exists('assets-dir', $extra);
-    }
-
-    /**
-     * @return bool
-     */
-    public static function containsDoc(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return !empty($extra) && array_key_exists('doc-dir', $extra);
-    }
-
-    /**
-     * @return bool
-     */
-    public static function containsConfig(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        $config_file = self::guessConfigFiles($package);
-        return (!empty($extra) && array_key_exists('config-dir', $extra)) || (!empty($config_file));
-    }
-
-    /**
-     * @return bool
-     */
-    public static function containsLanguages(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        $ln_file = self::guessLanguageFiles($package);
-        return (!empty($extra) && array_key_exists('i18n-dir', $extra)) || (!empty($ln_file));
-    }
-
 // ---------------------------
 // Assets Installer
 // ---------------------------
@@ -219,20 +184,20 @@ class CarteBlancheInstaller
     {
         $type = self::getPackageType($package);
         if (self::mustHandlePackageType($type)) {
-            if ($this->containsAssets($package)) {
+            if ($this->isPackageContains($package, 'assets-dir')) {
                 $ok = parent::isInstalled($repo, $package);
                 if (!$ok) return $ok;
             } else {
                 $ok = LibraryInstaller::isInstalled($repo, $package);
                 if (!$ok) return $ok;
             }
-            if ($this->containsConfig($package)) {
+            if ($this->isPackageContains($package, 'config-dir', 'carte-blanche-configs')) {
                 $ok = $this->isInstalledConfig($package);
             }
-            if ($this->containsLanguages($package)) {
+            if ($this->isPackageContains($package, 'i18n-dir', 'carte-blanche-i18n')) {
                 $ok = $this->isInstalledLanguage($package);
             }
-            if ($this->containsDoc($package)) {
+            if ($this->isPackageContains($package, 'doc-dir', 'carte-blanche-docs')) {
                 $ok = $this->isInstalledDoc($package);
             }
             return $ok;
@@ -248,18 +213,18 @@ class CarteBlancheInstaller
     {
         $type = self::getPackageType($package);
         if (self::mustHandlePackageType($type)) {
-            if ($this->containsAssets($package)) {
+            if ($this->isPackageContains($package, 'assets-dir')) {
                 parent::install($repo, $package);
             } else {
                 LibraryInstaller::install($repo, $package);
             }
-            if ($this->containsConfig($package)) {
+            if ($this->isPackageContains($package, 'config-dir', 'carte-blanche-configs')) {
                 $this->installConfig($package);
             }
-            if ($this->containsLanguages($package)) {
+            if ($this->isPackageContains($package, 'i18n-dir', 'carte-blanche-i18n')) {
                 $this->installLanguage($package);
             }
-            if ($this->containsDoc($package)) {
+            if ($this->isPackageContains($package, 'doc-dir', 'carte-blanche-docs')) {
                 $ok = $this->installDoc($package);
             }
         } else {
@@ -274,22 +239,22 @@ class CarteBlancheInstaller
     {
         $type = self::getPackageType($initial);
         if (self::mustHandlePackageType($type)) {
-            if ($this->containsConfig($initial)) {
+            if ($this->isPackageContains($initial, 'config-dir', 'carte-blanche-configs')) {
                 $this->removeConfig($initial);
             }
-            if ($this->containsAssets($initial)) {
+            if ($this->isPackageContains($initial, 'assets-dir')) {
                 parent::update($repo, $initial, $target);
             } else {
                 LibraryInstaller::update($repo, $initial, $target);
             }
-            if ($this->containsConfig($target)) {
+            if ($this->isPackageContains($target, 'config-dir', 'carte-blanche-configs')) {
                 $this->installConfig($target);
             }
-            if ($this->containsLanguages($target)) {
+            if ($this->isPackageContains($target, 'i18n-dir', 'carte-blanche-i18n')) {
                 $this->installLanguage($target);
             }
-            if ($this->containsDoc($package)) {
-                $ok = $this->installDoc($package);
+            if ($this->isPackageContains($target, 'doc-dir', 'carte-blanche-docs')) {
+                $ok = $this->installDoc($target);
             }
         } else {
             return parent::update($repo, $initial, $target);
@@ -303,16 +268,16 @@ class CarteBlancheInstaller
     {
         $type = self::getPackageType($package);
         if (self::mustHandlePackageType($type)) {
-            if ($this->containsConfig($package)) {
+            if ($this->isPackageContains($package, 'config-dir', 'carte-blanche-configs')) {
                 $this->removeConfig($package);
             }
-            if ($this->containsLanguages($package)) {
+            if ($this->isPackageContains($package, 'i18n-dir', 'carte-blanche-i18n')) {
                 $this->removeLanguage($package);
             }
-            if ($this->containsDoc($package)) {
+            if ($this->isPackageContains($package, 'doc-dir', 'carte-blanche-docs')) {
                 $ok = $this->removeDoc($package);
             }
-            if ($this->containsAssets($package)) {
+            if ($this->isPackageContains($package, 'assets-dir')) {
                 return parent::uninstall($repo, $package);
             } else {
                 return LibraryInstaller::uninstall($repo, $package);
@@ -339,24 +304,6 @@ class CarteBlancheInstaller
 // ---------------------------
 // Config files
 // ---------------------------
-
-    public static function guessConfigDir(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['config-dir']) ? $extra['config-dir'] : Config::get('config-dir');
-    }
-
-    public static function guessConfigVendorDir(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['config-vendor-dir']) ? $extra['config-vendor-dir'] : Config::get('config-vendor-dir');
-    }
-
-    public static function guessConfigFiles(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['carte-blanche-configs']) ? $extra['carte-blanche-configs'] : Config::get('carte-blanche-configs');
-    }
 
     protected function getConfigDir()
     {
@@ -392,80 +339,18 @@ class CarteBlancheInstaller
 
     public function getRootPackageConfigFiles(PackageInterface $package)
     {
-        $package_config_files = array();
-        $config_files = $this->guessConfigFiles($package);
-        if (empty($config_files)) {
-            return array();
-        }
-        if (!empty($config_files) && !is_array($config_files)) {
-            $config_files = array($config_files);
-        }
-        $base_path = rtrim($this->getAppBasePath(), '/') . DIRECTORY_SEPARATOR;
-
-        if (!empty($config_files)) {
-            foreach ($config_files as $file) {
-                $from_file = $base_path . $file;
-                if (file_exists($from_file)) {
-                    $package_config_files[] = $from_file;
-                } else {
-                    $this->io->write( 
-                        sprintf('Skipping config file <info>%s</info> from package <info>%s</info>: file not found!', 
-                            str_replace(dirname($this->config_dir) . '/', '', $from_file),
-                            $package->getPrettyName()
-                        )
-                    );
-                }
-            }
-        }
-
-        return $package_config_files;
+        return $this->_getPackageFiles(
+            $package, 'carte-blanche-configs', null, $this->config_dir, 
+            $this->getAppBasePath(), 'configuration file'
+        );
     }
     
     public function getPackageConfigFiles(PackageInterface $package)
     {
-        $package_config_files = array();
-        $config_files = $this->guessConfigFiles($package);
-        $config_dir = $this->guessConfigDir($package);
-        if (empty($config_dir) && empty($config_files)) {
-            return array();
-        }
-        if (!empty($config_files) && !is_array($config_files)) {
-            $config_files = array($config_files);
-        }
-        $base_path = rtrim($this->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR;
-
-        if (!empty($config_files)) {
-            foreach ($config_files as $file) {
-                $from_file = $base_path . $file;
-                if (file_exists($from_file)) {
-                    $package_config_files[] = $from_file;
-                } else {
-                    $this->io->write( 
-                        sprintf('Skipping config file <info>%s</info> from package <info>%s</info>: file not found!', 
-                            str_replace(dirname($this->config_dir) . '/', '', $from_file),
-                            $package->getPrettyName()
-                        )
-                    );
-                }
-            }
-        }
-
-        if (!empty($config_dir)) {
-            $config_dir_path = $base_path . $config_dir;
-            if (file_exists($config_dir_path)) {
-                $it = new RecursiveDirectoryIterator($config_dir_path, RecursiveDirectoryIterator::SKIP_DOTS);
-                $ri = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
-                foreach ($ri as $file) {
-                    if (!in_array($file->getPathname(), $package_config_files)) {
-                        if ($file->isFile()) {
-                            $package_config_files[] = $file->getPathname();
-                        }
-                    }
-                }
-            }
-        }
-        
-        return $package_config_files;
+        return $this->_getPackageFiles(
+            $package, 'carte-blanche-configs', 'config-dir', $this->config_dir, 
+            $this->getPackageBasePath($package), 'configuration file'
+        );
     }
 
     /**
@@ -653,18 +538,6 @@ class CarteBlancheInstaller
 // Documentation files
 // ---------------------------
 
-    public static function guessDocDir(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['doc-dir']) ? $extra['doc-dir'] : Config::get('doc-dir');
-    }
-
-    public static function guessDocFiles(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['carte-blanche-docs']) ? $extra['carte-blanche-docs'] : Config::get('carte-blanche-docs');
-    }
-
     protected function getDocDir()
     {
         $this->initializeDocDir();
@@ -684,49 +557,10 @@ class CarteBlancheInstaller
 
     public function getPackageDocFiles(PackageInterface $package)
     {
-        $package_doc_files = array();
-        $doc_files = $this->guessDocFiles($package);
-        $doc_dir = $this->guessDocDir($package);
-        if (empty($doc_dir) && empty($doc_files)) {
-            return array();
-        }
-        if (!empty($doc_files) && !is_array($doc_files)) {
-            $doc_files = array($doc_files);
-        }
-        $base_path = rtrim($this->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR;
-
-        if (!empty($doc_files)) {
-            foreach ($doc_files as $file) {
-                $from_file = $base_path . $file;
-                if (file_exists($from_file)) {
-                    $package_doc_files[] = $from_file;
-                } else {
-                    $this->io->write( 
-                        sprintf('Skipping documentation file <info>%s</info> from package <info>%s</info>: file not found!', 
-                            str_replace(dirname($this->doc_dir) . '/', '', $from_file),
-                            $package->getPrettyName()
-                        )
-                    );
-                }
-            }
-        }
-
-        if (!empty($doc_dir)) {
-            $doc_dir_path = $base_path . $doc_dir;
-            if (file_exists($doc_dir_path)) {
-                $it = new RecursiveDirectoryIterator($doc_dir_path, RecursiveDirectoryIterator::SKIP_DOTS);
-                $ri = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
-                foreach ($ri as $file) {
-                    if (!in_array($file->getPathname(), $package_doc_files)) {
-                        if ($file->isFile()) {
-                            $package_doc_files[] = $file->getPathname();
-                        }
-                    }
-                }
-            }
-        }
-        
-        return $package_doc_files;
+        return $this->_getPackageFiles(
+            $package, 'carte-blanche-docs', 'doc-dir', $this->i18n_dir, 
+            $this->getPackageBasePath($package), 'documentation file'
+        );
     }
 
     /**
@@ -816,7 +650,7 @@ class CarteBlancheInstaller
                 $this->io->write('    <warning>Skipped linking of '.basename($doc).': file not found in package</warning>');
                 continue;
             }
-            $link = $this->doc_vendor_dir.'/'.basename($doc);
+            $link = $this->doc_dir.'/'.basename($doc);
             if (file_exists($link)) {
                 if (is_link($link)) {
                     chmod($link, 0777 & ~umask());
@@ -866,24 +700,6 @@ class CarteBlancheInstaller
 // Language files
 // ---------------------------
 
-    public static function guessLanguageDir(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['i18n-dir']) ? $extra['i18n-dir'] : Config::get('i18n-dir');
-    }
-
-    public static function guessLanguageVendorDir(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['i18n-vendor-dir']) ? $extra['i18n-vendor-dir'] : Config::get('i18n-vendor-dir');
-    }
-
-    public static function guessLanguageFiles(PackageInterface $package)
-    {
-        $extra = $package->getExtra();
-        return isset($extra['carte-blanche-i18n']) ? $extra['carte-blanche-i18n'] : Config::get('carte-blanche-i18n');
-    }
-
     protected function getLanguageDir()
     {
         $this->initializeLanguageDir();
@@ -918,80 +734,18 @@ class CarteBlancheInstaller
 
     public function getRootPackageLanguageFiles(PackageInterface $package)
     {
-        $package_i18n_files = array();
-        $i18n_files = $this->guessLanguageFiles($package);
-        if (empty($i18n_files)) {
-            return array();
-        }
-        if (!empty($i18n_files) && !is_array($i18n_files)) {
-            $i18n_files = array($i18n_files);
-        }
-        $base_path = rtrim($this->getAppBasePath(), '/') . DIRECTORY_SEPARATOR;
-
-        if (!empty($i18n_files)) {
-            foreach ($i18n_files as $file) {
-                $from_file = $base_path . $file;
-                if (file_exists($from_file)) {
-                    $package_i18n_files[] = $from_file;
-                } else {
-                    $this->io->write( 
-                        sprintf('Skipping language file <info>%s</info> from package <info>%s</info>: file not found!', 
-                            str_replace(dirname($this->i18n_dir) . '/', '', $from_file),
-                            $package->getPrettyName()
-                        )
-                    );
-                }
-            }
-        }
-
-        return $package_i18n_files;
+        return $this->_getPackageFiles(
+            $package, 'carte-blanche-i18n', null, $this->i18n_dir,
+            $this->getAppBasePath(), 'language file'
+        );
     }
-    
+
     public function getPackageLanguageFiles(PackageInterface $package)
     {
-        $package_i18n_files = array();
-        $i18n_files = $this->guessLanguageFiles($package);
-        $i18n_dir = $this->guessLanguageDir($package);
-        if (empty($i18n_dir) && empty($i18n_files)) {
-            return array();
-        }
-        if (!empty($i18n_files) && !is_array($i18n_files)) {
-            $i18n_files = array($i18n_files);
-        }
-        $base_path = rtrim($this->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR;
-
-        if (!empty($i18n_files)) {
-            foreach ($i18n_files as $file) {
-                $from_file = $base_path . $file;
-                if (file_exists($from_file)) {
-                    $package_i18n_files[] = $from_file;
-                } else {
-                    $this->io->write( 
-                        sprintf('Skipping language file <info>%s</info> from package <info>%s</info>: file not found!', 
-                            str_replace(dirname($this->i18n_dir) . '/', '', $from_file),
-                            $package->getPrettyName()
-                        )
-                    );
-                }
-            }
-        }
-
-        if (!empty($i18n_dir)) {
-            $i18n_dir_path = $base_path . $i18n_dir;
-            if (file_exists($i18n_dir_path)) {
-                $it = new RecursiveDirectoryIterator($i18n_dir_path, RecursiveDirectoryIterator::SKIP_DOTS);
-                $ri = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
-                foreach ($ri as $file) {
-                    if (!in_array($file->getPathname(), $package_i18n_files)) {
-                        if ($file->isFile()) {
-                            $package_i18n_files[] = $file->getPathname();
-                        }
-                    }
-                }
-            }
-        }
-        
-        return $package_i18n_files;
+        return $this->_getPackageFiles(
+            $package, 'carte-blanche-i18n', 'i18n-dir', $this->i18n_dir,
+            $this->getPackageBasePath($package), 'language file'
+        );
     }
 
     /**
@@ -1229,36 +983,14 @@ class CarteBlancheInstaller
      */
     public function getBundleInstallPath(PackageInterface $package)
     {
-        if (self::extractBundlePrefix($package) != Config::get('bundle-name')) {
+        if (self::extractPrefix($package, 'bundle-name') != Config::get('bundle-name')) {
             throw new \InvalidArgumentException(
                 sprintf('Unable to install bundle, CarteBlanche bundles should always start their package name with "%s"',
                     Config::get('bundle-name'))
             );
         }
 
-        return $this->getBundleRootPath() . '/' . self::extractBundleShortName($package);
-    }
-
-    /**
-     * Extract the first 21 characters ("carte-blanche/bundle-") of the package name; which is expected to be the prefix.
-     *
-     * @param PackageInterface $package
-     * @return string
-     */
-    public static function extractBundlePrefix(PackageInterface $package)
-    {
-        return substr($package->getPrettyName(), 0, strlen(Config::get('bundle-name')));
-    }
-
-    /**
-     * Extract the everything after the first 21 characters of the package name; which is expected to be the short name.
-     *
-     * @param PackageInterface $package
-     * @return string
-     */
-    public static function extractBundleShortName(PackageInterface $package)
-    {
-        return substr($package->getPrettyName(), strlen(Config::get('bundle-name')));
+        return $this->getBundleRootPath() . '/' . self::extractShortName($package, 'bundle-name');
     }
 
 // ---------------------------
@@ -1292,13 +1024,13 @@ class CarteBlancheInstaller
      */
     public function getToolInstallPath(PackageInterface $package)
     {
-        if (self::extractToolPrefix($package) != Config::get('tool-name')) {
+        if (self::extractPrefix($package, 'tool-name') != Config::get('tool-name')) {
             throw new \InvalidArgumentException(
                 sprintf('Unable to install tool, CarteBlanche tools should always start their package name with "%s"',
                     Config::get('tool-name'))
             );
         }
-        $tool_name = self::extractToolShortName($package);
+        $tool_name = self::extractShortName($package, 'tool-name');
         if (in_array($tool_name, array('all', 'defaults'))) {
             return $this->getToolRootPath();
         } else {
@@ -1306,26 +1038,102 @@ class CarteBlancheInstaller
         }
     }
 
-    /**
-     * Extract the first 19 characters ("carte-blanche/tool-") of the package name; which is expected to be the prefix.
-     *
-     * @param PackageInterface $package
-     * @return string
-     */
-    public static function extractToolPrefix(PackageInterface $package)
+// ---------------------------
+// Utilities
+// ---------------------------
+
+    public static function guessConfigurationEntry(PackageInterface $package, $config_entry)
     {
-        return substr($package->getPrettyName(), 0, strlen(Config::get('tool-name')));
+        if (empty($config_entry)) return array();
+        $extra = $package->getExtra();
+        return isset($extra[$config_entry]) ? $extra[$config_entry] : Config::get($config_entry);
     }
 
     /**
-     * Extract the everything after the first 19 characters of the package name; which is expected to be the short name.
-     *
+     * @return bool
+     */
+    public static function isPackageContains(PackageInterface $package, $type, $package_extra = null)
+    {
+        $extra = $package->getExtra();
+        if (!is_null($package_extra)) {
+            $files = self::guessConfigurationEntry($package, $package_extra);
+            return (!empty($extra) && array_key_exists($type, $extra)) || (!empty($files));
+        } else {
+            return !empty($extra) && array_key_exists($type, $extra);
+        }
+    }
+
+    /**
      * @param PackageInterface $package
      * @return string
      */
-    public static function extractToolShortName(PackageInterface $package)
+    public static function extractPrefix(PackageInterface $package, $type)
     {
-        return substr($package->getPrettyName(), strlen(Config::get('tool-name')));
+        return substr($package->getPrettyName(), 0, strlen(Config::get($type)));
+    }
+
+    /**
+     * @param PackageInterface $package
+     * @return string
+     */
+    public static function extractShortName(PackageInterface $package, $type)
+    {
+        return substr($package->getPrettyName(), strlen(Config::get($type)));
+    }
+
+    /**
+     * Get a list of files from package
+     */
+    protected function _getPackageFiles(
+        PackageInterface $package,
+        $files_type, $dir_type,
+        $root_dir, $base_path,
+        $name = ''
+    ) {
+        $package_files = array();
+        $_files = $this->guessConfigurationEntry($package, $files_type);
+        $_dir = $this->guessConfigurationEntry($package, $dir_type);
+        if (empty($_dir) && empty($_files)) {
+            return array();
+        }
+        if (!empty($_files) && !is_array($_files)) {
+            $_files = array($_files);
+        }
+        $base_path = rtrim($base_path, '/') . DIRECTORY_SEPARATOR;
+
+        if (!empty($_files)) {
+            foreach ($_files as $file) {
+                $from_file = $base_path . $file;
+                if (file_exists($from_file)) {
+                    $package_files[] = $from_file;
+                } else {
+                    $this->io->write( 
+                        sprintf('Skipping %s <info>%s</info> from package <info>%s</info>: file not found!', 
+                            $name,
+                            str_replace(dirname($root_dir).'/', '', $from_file),
+                            $package->getPrettyName()
+                        )
+                    );
+                }
+            }
+        }
+
+        if (!empty($_dir)) {
+            $_dir_path = $base_path . $_dir;
+            if (file_exists($_dir_path)) {
+                $it = new RecursiveDirectoryIterator($_dir_path, RecursiveDirectoryIterator::SKIP_DOTS);
+                $ri = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
+                foreach ($ri as $file) {
+                    if (!in_array($file->getPathname(), $package_files)) {
+                        if ($file->isFile()) {
+                            $package_files[] = $file->getPathname();
+                        }
+                    }
+                }
+            }
+        }
+
+        return $package_files;
     }
 
 }
