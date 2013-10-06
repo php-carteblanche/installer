@@ -182,7 +182,7 @@ class CarteBlancheInstaller
     /**
      * @return bool
      */
-    public static function containsAssets(PackageInterface $package)
+    public static function containsDoc(PackageInterface $package)
     {
         $extra = $package->getExtra();
         return !empty($extra) && array_key_exists('doc-dir', $extra);
