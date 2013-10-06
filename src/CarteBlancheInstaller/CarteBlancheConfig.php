@@ -99,18 +99,20 @@ class CarteBlancheConfig
 // Carte Blanche
             // relative config files directory from root
             'config-dir' => 'config',
-            // relative vendor config files directory from config directory
-            'config-vendor-dir' => 'vendor',
-            // list of config files from package's root
-            'carte-blanche-configs' => null,
+            // relative documentation files directory from root
+            'doc-dir' => 'doc',
             // relative language files directory from root
             'i18n-dir' => 'i18n',
-            // relative vendor language files directory from config directory
-            'i18n-vendor-dir' => 'vendor',
-            // list of language files from package's root
-            'carte-blanche-i18n' => null,
             // relative var files directory from root
             'var-dir' => 'var',
+            // relative vendor config files directory from config directory
+            'config-vendor-dir' => 'vendor',
+            // relative vendor language files directory from config directory
+            'i18n-vendor-dir' => 'vendor',
+            // list of config files from package's root
+            'carte-blanche-configs' => null,
+            // list of language files from package's root
+            'carte-blanche-i18n' => null,
             // relative bundles directory from root
             'bundle-dir' => 'src/bundles',
             // name mask of bundles

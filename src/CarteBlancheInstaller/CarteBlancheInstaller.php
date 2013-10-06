@@ -182,6 +182,15 @@ class CarteBlancheInstaller
     /**
      * @return bool
      */
+    public static function containsAssets(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+        return !empty($extra) && array_key_exists('doc-dir', $extra);
+    }
+
+    /**
+     * @return bool
+     */
     public static function containsConfig(PackageInterface $package)
     {
         $extra = $package->getExtra();
@@ -223,6 +232,9 @@ class CarteBlancheInstaller
             if ($this->containsLanguages($package)) {
                 $ok = $this->isInstalledLanguage($package);
             }
+            if ($this->containsDoc($package)) {
+                $ok = $this->isInstalledDoc($package);
+            }
             return $ok;
         } else {
             return parent::isInstalled($repo, $package);
@@ -246,6 +258,9 @@ class CarteBlancheInstaller
             }
             if ($this->containsLanguages($package)) {
                 $this->installLanguage($package);
+            }
+            if ($this->containsDoc($package)) {
+                $ok = $this->installDoc($package);
             }
         } else {
             return parent::install($repo, $package);
@@ -273,6 +288,9 @@ class CarteBlancheInstaller
             if ($this->containsLanguages($target)) {
                 $this->installLanguage($target);
             }
+            if ($this->containsDoc($package)) {
+                $ok = $this->installDoc($package);
+            }
         } else {
             return parent::update($repo, $initial, $target);
         }
@@ -290,6 +308,9 @@ class CarteBlancheInstaller
             }
             if ($this->containsLanguages($package)) {
                 $this->removeLanguage($package);
+            }
+            if ($this->containsDoc($package)) {
+                $ok = $this->removeDoc($package);
             }
             if ($this->containsAssets($package)) {
                 return parent::uninstall($repo, $package);
@@ -618,6 +639,219 @@ class CarteBlancheInstaller
         $return = false;
         foreach ($config_files as $config) {
             $link = $this->config_vendor_dir.'/'.basename($config);
+            if (is_link($link) || file_exists($link)) {
+                $return = unlink($link);
+            }
+            if (file_exists($link.'.bat')) {
+                $return = unlink($link.'.bat');
+            }
+        }
+        return $return;
+    }
+
+// ---------------------------
+// Documentation files
+// ---------------------------
+
+    public static function guessDocDir(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+        return isset($extra['doc-dir']) ? $extra['doc-dir'] : Config::get('doc-dir');
+    }
+
+    public static function guessDocFiles(PackageInterface $package)
+    {
+        $extra = $package->getExtra();
+        return isset($extra['carte-blanche-docs']) ? $extra['carte-blanche-docs'] : Config::get('carte-blanche-docs');
+    }
+
+    protected function getDocDir()
+    {
+        $this->initializeDocDir();
+        return $this->doc_dir;
+    }
+
+    protected function initializeDocDir()
+    {
+        $this->filesystem->ensureDirectoryExists($this->doc_dir);
+        $this->doc_dir = realpath($this->doc_dir);
+    }
+
+    public function getDocInstallPath(PackageInterface $package)
+    {
+        return $this->getDocDir();
+    }
+
+    public function getPackageDocFiles(PackageInterface $package)
+    {
+        $package_doc_files = array();
+        $doc_files = $this->guessDocFiles($package);
+        $doc_dir = $this->guessDocDir($package);
+        if (empty($doc_dir) && empty($doc_files)) {
+            return array();
+        }
+        if (!empty($doc_files) && !is_array($doc_files)) {
+            $doc_files = array($doc_files);
+        }
+        $base_path = rtrim($this->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR;
+
+        if (!empty($doc_files)) {
+            foreach ($doc_files as $file) {
+                $from_file = $base_path . $file;
+                if (file_exists($from_file)) {
+                    $package_doc_files[] = $from_file;
+                } else {
+                    $this->io->write( 
+                        sprintf('Skipping documentation file <info>%s</info> from package <info>%s</info>: file not found!', 
+                            str_replace(dirname($this->doc_dir) . '/', '', $from_file),
+                            $package->getPrettyName()
+                        )
+                    );
+                }
+            }
+        }
+
+        if (!empty($doc_dir)) {
+            $doc_dir_path = $base_path . $doc_dir;
+            if (file_exists($doc_dir_path)) {
+                $it = new RecursiveDirectoryIterator($doc_dir_path, RecursiveDirectoryIterator::SKIP_DOTS);
+                $ri = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::SELF_FIRST);
+                foreach ($ri as $file) {
+                    if (!in_array($file->getPathname(), $package_doc_files)) {
+                        if ($file->isFile()) {
+                            $package_doc_files[] = $file->getPathname();
+                        }
+                    }
+                }
+            }
+        }
+        
+        return $package_doc_files;
+    }
+
+    /**
+     * Test if documentation files of a package already exists
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    protected function isInstalledDoc(PackageInterface $package)
+    {
+        $from_files = $this->getPackageDocFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getDocInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $return = false;
+        foreach ($from_files as $config) {
+            if (file_exists($config)) {
+                $link = $this->doc_dir.'/'.basename($config);
+                $return = file_exists($link);
+            }
+        }
+        return $return;
+    }
+
+    /**
+     * Link the documentation files of a package
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    protected function installDoc(PackageInterface $package)
+    {
+        $from_files = $this->getPackageDocFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getDocInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $package_base_path = rtrim($this->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR;
+        $this->io->write( 
+            sprintf('  - Linking <info>%s</info> documentation to <info>%s</info>', 
+                $package->getPrettyName(),
+                str_replace(dirname($this->doc_dir) . '/', '', $target)
+            )
+        );
+        $return = $this->doInstallDoc($from_files, $target);
+        $this->io->write('');
+        return $return;
+    }
+
+    /**
+     * Remove the config files of a package
+     *
+     * @param object $package Composer\Package\PackageInterface
+     * @return bool
+     */
+    protected function removeDoc(PackageInterface $package)
+    {
+        $from_files = $this->getPackageDocFiles($package);
+        if (empty($from_files)) {
+            return;
+        }
+        $target = rtrim($this->getDocInstallPath($package), '/') . DIRECTORY_SEPARATOR;
+        $this->io->write( 
+            sprintf('  - Removing <info>%s</info> documentation to <info>%s</info>', 
+                $package->getPrettyName(),
+                str_replace(dirname($this->doc_dir) . '/', '', $target)
+            )
+        );
+        $return = $this->doRemoveDoc($from_files);
+        $this->io->write('');
+        return $return;
+    }
+
+    /**
+     * Actually process the config links/files isntallation
+     * @param array $doc_files
+     * @param string $target
+     * @return bool
+     */
+    protected function doInstallDoc(array $doc_files, $target)
+    {
+        $app_base_path = rtrim($this->getAppBasePath(), '/') . DIRECTORY_SEPARATOR;
+        $return = false;
+        foreach ($doc_files as $doc) {
+            if (!file_exists($doc)) {
+                $this->io->write('    <warning>Skipped linking of '.basename($doc).': file not found in package</warning>');
+                continue;
+            }
+            $link = $this->doc_vendor_dir.'/'.basename($doc);
+            if (file_exists($link)) {
+                if (is_link($link)) {
+                    chmod($link, 0777 & ~umask());
+                }
+                $this->io->write('    Skipped linking of '.basename($doc).': name conflicts with an existing file');
+                continue;
+            }
+            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+                $return = $this->filesystem->copyFiles($doc, $target);
+            } else {
+                $cwd = getcwd();
+                try {
+                    $relativeConfig = $this->filesystem->findShortestPath($link, $app_base_path . str_replace($app_base_path, '', $doc));
+                    chdir(dirname($link));
+                    $return = symlink($relativeConfig, $link);
+                } catch (\ErrorException $e) {
+                    $return = $this->filesystem->copyFiles($doc, $target);
+                }
+                chdir($cwd);
+            }
+            chmod($link, 0777 & ~umask());
+        }
+        return $return;
+    }
+
+    /**
+     * Actually process the config links/files removing
+     * @param array $doc_files
+     * @return bool
+     */
+    protected function doRemoveDoc(array $doc_files)
+    {
+        $return = false;
+        foreach ($doc_files as $doc) {
+            $link = $this->doc_dir.'/'.basename($doc);
             if (is_link($link) || file_exists($link)) {
                 $return = unlink($link);
             }
