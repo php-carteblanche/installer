@@ -94,8 +94,10 @@ class CarteBlancheAutoloadGenerator
 
         $installer = CarteBlancheInstaller::getInstanciatedInstance();
         $type = $installer->getPackageType($package);
+        $installer->getAssetsInstallPath($package);
         if ($installer->mustHandlePackageType($type)) {
-            $cb_rel_path = $installer->getInstallPath($package);
+            $cb_path = $installer->getInstallPath($package);
+            $cb_rel_path = str_replace($installer->getAppBasePath().'/', '', $cb_path);
 
             foreach (array('layouts_path', 'views_path', 'views_functions') as $entry) {
                 if (isset($data[$entry])) {
