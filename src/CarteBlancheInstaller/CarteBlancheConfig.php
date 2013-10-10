@@ -43,6 +43,7 @@ class CarteBlancheConfig
         $_bs_filename = 'bootstrap.php';
         // hack
         @define('_ROOTFILE', false);
+        @define('_CARTEBLANCHE_BUILDER', true);
         // [src/bootstrap.php]/vendor/carte-blanche/installer/src/CarteBlancheInstaller/
         if (file_exists($_bs = realpath(__DIR__.$_ds.'..'.$_ds.'..'.$_ds.'..'.$_ds.'..'.$_ds.'..'.$_ds.$_bs_filename))) {
             include_once $_bs;
