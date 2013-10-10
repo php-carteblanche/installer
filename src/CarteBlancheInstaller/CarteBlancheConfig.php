@@ -39,6 +39,18 @@ class CarteBlancheConfig
      */
     public static function getDefaults()
     {
+        $_ds = DIRECTORY_SEPARATOR;
+        $_bs_filename = 'bootstrap.php';
+        // hack
+        @define('_ROOTFILE', false);
+        // [src/bootstrap.php]/vendor/carte-blanche/installer/src/CarteBlancheInstaller/
+        if (file_exists($_bs = realpath(__DIR__.$_ds.'..'.$_ds.'..'.$_ds.'..'.$_ds.'..'.$_ds.'..'.$_ds.$_bs_filename))) {
+            include_once $_bs;
+        } else {
+            throw new \ErrorException(
+                sprintf('Bootstrap file "%s" not found in project! (searched as "%s")', $_bs_filename, $_bs)
+            );
+        }
         return array(
 
 // Assets Manager
@@ -50,11 +62,11 @@ class CarteBlancheConfig
                 self::CARTEBLANCHE_BUNDLETYPE,
             ),
             // The default package vendor directory name (related to package root dir)
-            'vendor-dir' => 'src/vendor',
+            'vendor-dir' => _SRCDIR._VENDORDIRNAME,
             // The default package assets directory name (related to package root dir)
-            'assets-dir' => 'www',
+            'assets-dir' => _WEBDIR,
             // The default third-party packages'assets directory name (related to package assets dir)
-            'assets-vendor-dir' => 'vendor',
+            'assets-vendor-dir' => _VENDORDIRNAME,
             // The default package root directory is set on `$_SERVER['DOCUMENT_ROOT']`
             'document-root' => $_SERVER['DOCUMENT_ROOT'],
             // The assets database file created on install
@@ -86,39 +98,40 @@ class CarteBlancheConfig
 
 // Template Engine
             // relative cache directory from assets-dir
-            'cache-dir' => 'tmp',
+            'cache-dir' => _TMPDIRNAME,
             // relative assets cache directory from assets-dir
-            'cache-assets-dir' => 'tmp/assets',
+            'cache-assets-dir' => _TMPDIRNAME.'assets',
             // relative layouts from root-dir
-            'layouts' => 'src/CarteBlanche/views',
+            'layouts' => _SRCDIR._VIEWSDIRNAME,
             // relative views from root-dir
-            'views' => 'src/CarteBlanche/views',
+            'views' => _SRCDIR._VIEWSDIRNAME,
             // relative views functions from root-dir
-            'views-functions' => 'src/views_aliases.php',
+            // taken from `composer.json`
+            'views-functions' => 'src/app_views_fcts.php',
             
 // Carte Blanche
             // relative config files directory from root
-            'config-dir' => 'config',
+            'config-dir' => _CONFIGDIR,
             // relative documentation files directory from root
-            'doc-dir' => 'doc',
+            'doc-dir' => _DOCDIR,
             // relative language files directory from root
-            'i18n-dir' => 'i18n',
+            'i18n-dir' => _LANGUAGEDIR,
             // relative var files directory from root
-            'var-dir' => 'var',
+            'var-dir' => _VARDIR,
             // relative vendor config files directory from config directory
-            'config-vendor-dir' => 'vendor',
+            'config-vendor-dir' => _VENDORDIRNAME,
             // relative vendor language files directory from config directory
-            'i18n-vendor-dir' => 'vendor',
+            'i18n-vendor-dir' => _VENDORDIRNAME,
             // list of config files from package's root
             'carte-blanche-configs' => null,
             // list of language files from package's root
             'carte-blanche-i18n' => null,
             // relative bundles directory from root
-            'bundle-dir' => 'src/bundles',
+            'bundle-dir' => _SRCDIR._BUNDLESDIR,
             // name mask of bundles
             'bundle-name' => 'carte-blanche/bundle-',
             // relative tools directory from root
-            'tool-dir' => 'src/tools',
+            'tool-dir' => _SRCDIR._TOOLSDIR,
             // name mask of tools
             'tool-name' => 'carte-blanche/tool-',
 
