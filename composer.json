@@ -14,8 +14,8 @@
     "require": {
         "atelierspierrot/patterns": "dev-master",
         "atelierspierrot/library": "dev-master",
-        "atelierspierrot/assets-manager": "dev-master",
-        "atelierspierrot/templatengine": "dev-master"
+        "atelierspierrot/assets-manager": "dev-plugin",
+        "atelierspierrot/templatengine": "dev-plugin"
     },
     "require-dev": {
         "composer/composer": "1.*@dev"
