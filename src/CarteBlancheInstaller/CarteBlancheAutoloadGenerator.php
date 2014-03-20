@@ -1,10 +1,13 @@
 <?php
 /**
- * CarteBlanche - PHP framework package - Installers package
- * Copyleft (c) 2013 Pierre Cassat and contributors
- * <www.ateliers-pierrot.fr> - <contact@ateliers-pierrot.fr>
- * License Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
- * Sources <http://github.com/php-carteblanche/carteblanche>
+ * CarteBlanche - PHP framework package - Composer installer package
+ * (c) Pierre Cassat and contributors
+ * 
+ * Sources <http://github.com/php-carteblanche/installer>
+ *
+ * License Apache-2.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace CarteBlancheInstaller;
@@ -28,7 +31,7 @@ use \CarteBlancheInstaller\BootstrapGenerator,
 /**
  * The framework installer for bundles, tools and Composer events
  *
- * @author 		Piero Wbmstr <piero.wbmstr@gmail.com>
+ * @author 		Piero Wbmstr <piwi@ateliers-pierrot.fr>
  */
 class CarteBlancheAutoloadGenerator
     extends TemplateEngineAutoloadGenerator

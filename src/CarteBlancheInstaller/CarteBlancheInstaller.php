@@ -1,10 +1,13 @@
 <?php
 /**
- * CarteBlanche - PHP framework package - Installers package
- * Copyleft (c) 2013 Pierre Cassat and contributors
- * <www.ateliers-pierrot.fr> - <contact@ateliers-pierrot.fr>
- * License Apache-2.0 <http://www.apache.org/licenses/LICENSE-2.0.html>
- * Sources <http://github.com/php-carteblanche/carteblanche>
+ * CarteBlanche - PHP framework package - Composer installer package
+ * (c) Pierre Cassat and contributors
+ * 
+ * Sources <http://github.com/php-carteblanche/installer>
+ *
+ * License Apache-2.0
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace CarteBlancheInstaller;
@@ -32,7 +35,7 @@ use \CarteBlancheInstaller\BootstrapGenerator,
 /**
  * The framework installer for bundles, tools and Composer events
  *
- * @author 		Piero Wbmstr <piero.wbmstr@gmail.com>
+ * @author 		Piero Wbmstr <piwi@ateliers-pierrot.fr>
  */
 class CarteBlancheInstaller
     extends AssetsInstaller
@@ -76,6 +79,27 @@ class CarteBlancheInstaller
      */
     public function __construct(IOInterface $io, Composer $composer, $type = 'library')
     {
+/*
+        $spl_loader         = realpath(__DIR__.'/../SplClassLoader.php');
+        $cb_namespace       = realpath(__DIR__.'/../../../core/src/');
+        $cb_defaultconfig   = realpath(__DIR__.'/../../../core/config/carteblanche.ini');
+
+        // register the CarteBlanche namespace
+        require_once __DIR__.'/../SplClassLoader.php';
+        $libraryLoader = new \SplClassLoader('CarteBlanche', $cb_namespace);
+        $libraryLoader->register();
+
+//        parent::__construct($io, $composer, $type);
+        $extra              = $composer->getPackage()->getExtra();
+        $cb_config_files    = isset($extra['carteblanche-config-files']) ? $extra['carteblanche-config-files'] : null;
+
+$configurator = new \CarteBlanche\App\Config();
+//$configurator->load();
+var_export($config_files);
+//        Config::load($configurator);
+
+exit('yo');
+*/
         Config::load('CarteBlancheInstaller\CarteBlancheConfig');
         parent::__construct($io, $composer, $type);
         $this->filesystem = new Filesystem;

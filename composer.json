@@ -1,6 +1,6 @@
 {
     "name": "carte-blanche/installer",
-    "type": "composer-installer",
+    "type": "composer-plugin",
     "description": "A special Composer installer for the CarteBlanche framework",
     "keywords": ["carte blanche"],
     "homepage": "http://github.com/php-carteblanche/installer",
@@ -22,7 +22,7 @@
         "post-autoload-dump": "\\CarteBlancheInstaller\\CarteBlancheInstaller::postAutoloadDump"
     },
     "extra": {
-        "class": "\\CarteBlancheInstaller\\CarteBlancheInstaller",
+        "class": "\\CarteBlancheInstaller\\CarteBlancheInstallerPlugin",
         "assets-config-class": "\\CarteBlancheInstaller\\CarteBlancheConfig",
         "assets-package-installer-class": "\\CarteBlancheInstaller\\CarteBlancheInstaller",
         "branch-alias": {
