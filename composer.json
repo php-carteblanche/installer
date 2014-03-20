@@ -22,7 +22,7 @@
         "post-autoload-dump": "\\CarteBlancheInstaller\\CarteBlancheInstaller::postAutoloadDump"
     },
     "extra": {
-        "class": "\\CarteBlancheInstaller\\CarteBlancheInstallerPlugin",
+        "class": "\\CarteBlancheInstaller\\Composer\\CarteBlancheInstallerPlugin",
         "assets-config-class": "\\CarteBlancheInstaller\\CarteBlancheConfig",
         "assets-package-installer-class": "\\CarteBlancheInstaller\\CarteBlancheInstaller",
         "branch-alias": {
