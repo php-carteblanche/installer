@@ -13,7 +13,8 @@
     "autoload": { "psr-0": { "CarteBlancheInstaller": "src/" } },
     "require": {
         "atelierspierrot/assets-manager": "1.*",
-        "atelierspierrot/templatengine": "1.*"
+        "atelierspierrot/templatengine": "1.*",
+        "composer-plugin-api": "1.0.0"
     },
     "require-dev": {
         "composer/composer": "1.*@dev"
