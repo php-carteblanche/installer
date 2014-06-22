@@ -12,14 +12,14 @@
 
 namespace CarteBlancheInstaller\Composer;
 
-use \Composer\Composer,
-    \Composer\IO\IOInterface,
-    \Composer\Script\Event,
-    \Composer\Plugin\PluginInterface,
-    \Composer\Plugin\PluginEvents,
-    \Composer\EventDispatcher\EventSubscriberInterface,
-    \Composer\Plugin\CommandEvent,
-    \Composer\Plugin\PreFileDownloadEvent;
+use \Composer\Composer;
+use \Composer\IO\IOInterface;
+use \Composer\Script\Event;
+use \Composer\Plugin\PluginInterface;
+use \Composer\Plugin\PluginEvents;
+use \Composer\EventDispatcher\EventSubscriberInterface;
+use \Composer\Plugin\CommandEvent;
+use \Composer\Plugin\PreFileDownloadEvent;
 
 use \CarteBlancheInstaller\CarteBlancheInstaller;
 
@@ -28,7 +28,7 @@ class CarteBlancheInstallerPlugin
 {
 
     /**
-     * @var object \AssetsManager\Composer\Dispatch
+     * @var \AssetsManager\Composer\Dispatch
      */
     protected $__installer;
 
@@ -59,7 +59,7 @@ class CarteBlancheInstallerPlugin
     /**
      * Pre file download event dispatcher
      *
-     * @param object \Composer\Plugin\PreFileDownloadEvent
+     * @param \Composer\Plugin\PreFileDownloadEvent $event
      */
     public function onPreFileDownload(PreFileDownloadEvent $event)
     {
@@ -72,7 +72,7 @@ var_export(func_get_args());
     /**
      * Command event dispatcher
      *
-     * @param object \Composer\Plugin\CommandEvent
+     * @param \Composer\Plugin\CommandEvent $event
      */
     public function onCommand(CommandEvent $event)
     {

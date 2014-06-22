@@ -12,13 +12,13 @@
 
 namespace CarteBlancheInstaller;
 
-use \Composer\Composer,
-    \Composer\IO\IOInterface,
-    \Composer\Autoload\AutoloadGenerator,
-    \Composer\Package\PackageInterface,
-    \Composer\Repository\RepositoryInterface,
-    \Composer\Util\Filesystem,
-    \Composer\Script\EventDispatcher;
+use \Composer\Composer;
+use \Composer\IO\IOInterface;
+use \Composer\Autoload\AutoloadGenerator;
+use \Composer\Package\PackageInterface;
+use \Composer\Repository\RepositoryInterface;
+use \Composer\Util\Filesystem;
+use \Composer\Script\EventDispatcher;
 
 use \AssetsManager\Config;
 
@@ -27,9 +27,10 @@ use \CarteBlancheInstaller\CarteBlancheInstaller;
 /**
  * The application bootstrap generator
  *
- * @author 		Piero Wbmstr <piwi@ateliers-pierrot.fr>
+ * @author  Piero Wbmstr <me@e-piwi.fr>
  */
-class BootstrapGenerator extends AutoloadGenerator
+class BootstrapGenerator
+    extends AutoloadGenerator
 {
 
     protected $composer;

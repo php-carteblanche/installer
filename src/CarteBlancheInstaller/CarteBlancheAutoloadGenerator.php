@@ -12,34 +12,34 @@
 
 namespace CarteBlancheInstaller;
 
-use \Composer\Composer,
-    \Composer\IO\IOInterface,
-    \Composer\Autoload\AutoloadGenerator,
-    \Composer\Package\PackageInterface,
-    \Composer\Repository\RepositoryInterface,
-    \Composer\Script\Event,
-    \Composer\Script\EventDispatcher;
+use \Composer\Composer;
+use \Composer\IO\IOInterface;
+use \Composer\Autoload\AutoloadGenerator;
+use \Composer\Package\PackageInterface;
+use \Composer\Repository\RepositoryInterface;
+use \Composer\Script\Event;
+use \Composer\Script\EventDispatcher;
 
-use \AssetsManager\Error,
-    \AssetsManager\Config,
-    \Assets\Composer\TemplateEngineAutoloadGenerator;
+use \AssetsManager\Error;
+use \AssetsManager\Config;
+use \Assets\Composer\TemplateEngineAutoloadGenerator;
 
-use \CarteBlancheInstaller\BootstrapGenerator,
-    \CarteBlancheInstaller\CarteBlancheConfig,
-    \CarteBlancheInstaller\CarteBlancheInstaller;
+use \CarteBlancheInstaller\BootstrapGenerator;
+use \CarteBlancheInstaller\CarteBlancheConfig;
+use \CarteBlancheInstaller\CarteBlancheInstaller;
 
 /**
  * The framework installer for bundles, tools and Composer events
  *
- * @author 		Piero Wbmstr <piwi@ateliers-pierrot.fr>
+ * @author  Piero Wbmstr <me@e-piwi.fr>
  */
 class CarteBlancheAutoloadGenerator
     extends TemplateEngineAutoloadGenerator
 {
 
     /**
-     * @param object $package Composer\Package\PackageInterface
-     * @param object $composer Composer\Composer
+     * @param \Composer\Package\PackageInterface $package
+     * @param \Composer\Composer $composer
      * @return void
      */
     public function __construct(PackageInterface $package, Composer $composer)
@@ -82,7 +82,7 @@ class CarteBlancheAutoloadGenerator
     /**
      * Parse the `composer.json` "extra" block of a package and return its transformed data
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @param string $assets_package_dir
      * @param string $vendor_package_dir
      * @return void
@@ -133,7 +133,7 @@ class CarteBlancheAutoloadGenerator
     /**
      * Parse the `composer.json` "extra" block of the root package and return its transformed data
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return void
      */
     public function parseRootComposerExtra(PackageInterface $package)

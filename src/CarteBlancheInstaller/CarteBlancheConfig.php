@@ -15,7 +15,7 @@ namespace CarteBlancheInstaller;
 use \AssetsManager\Config\DefaultConfig;
 
 /**
- * @author 		Piero Wbmstr <piwi@ateliers-pierrot.fr>
+ * @author  Piero Wbmstr <me@e-piwi.fr>
  */
 class CarteBlancheConfig
     extends DefaultConfig

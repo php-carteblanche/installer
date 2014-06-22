@@ -17,7 +17,8 @@ use AssetsManager\Composer\Util\Filesystem as OriginalFilesystem;
 /**
  * This class just completes the default `AssetsManager\Composer\Util\Filesystem` with a `copyFile` method
  */
-class Filesystem extends OriginalFilesystem
+class Filesystem
+    extends OriginalFilesystem
 {
 
     /**

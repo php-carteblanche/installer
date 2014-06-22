@@ -12,30 +12,30 @@
 
 namespace CarteBlancheInstaller;
 
-use \RecursiveDirectoryIterator,
-    \RecursiveIteratorIterator;
+use \RecursiveDirectoryIterator;
+use \RecursiveIteratorIterator;
 
-use \Composer\Composer,
-    \Composer\IO\IOInterface,
-    \Composer\Installer\LibraryInstaller,
-    \Composer\Package\PackageInterface,
-    \Composer\Repository\InstalledRepositoryInterface,
-    \Composer\Script\Event;
+use \Composer\Composer;
+use \Composer\IO\IOInterface;
+use \Composer\Installer\LibraryInstaller;
+use \Composer\Package\PackageInterface;
+use \Composer\Repository\InstalledRepositoryInterface;
+use \Composer\Script\Event;
 
-use \AssetsManager\Composer\Installer\AssetsInstaller,
-    \AssetsManager\Error,
-    \AssetsManager\Config;
+use \AssetsManager\Composer\Installer\AssetsInstaller;
+use \AssetsManager\Error;
+use \AssetsManager\Config;
 
-use \CarteBlancheInstaller\BootstrapGenerator,
-    \CarteBlancheInstaller\CarteBlancheConfig,
-    \CarteBlancheInstaller\CarteBlancheAutoloadGenerator,
-    \CarteBlancheInstaller\Util\Filesystem;
+use \CarteBlancheInstaller\BootstrapGenerator;
+use \CarteBlancheInstaller\CarteBlancheConfig;
+use \CarteBlancheInstaller\CarteBlancheAutoloadGenerator;
+use \CarteBlancheInstaller\Util\Filesystem;
 
 
 /**
  * The framework installer for bundles, tools and Composer events
  *
- * @author 		Piero Wbmstr <piwi@ateliers-pierrot.fr>
+ * @author  Piero Wbmstr <me@e-piwi.fr>
  */
 class CarteBlancheInstaller
     extends AssetsInstaller
@@ -175,7 +175,7 @@ exit('yo');
     /**
      * Get the package path based on package type: 'default', 'tool' or 'bundle'
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return string
      */
     public function getPackageBasePath(PackageInterface $package)
@@ -380,7 +380,7 @@ exit('yo');
     /**
      * Test if config files of a package already exists
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function isInstalledConfig(PackageInterface $package)
@@ -403,7 +403,7 @@ exit('yo');
     /**
      * Move the config files of a package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function installConfig(PackageInterface $package)
@@ -428,7 +428,7 @@ exit('yo');
     /**
      * Remove the config files of a package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function removeConfig(PackageInterface $package)
@@ -452,7 +452,7 @@ exit('yo');
     /**
      * Move the config files of the root package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     public function installRootConfig(PackageInterface $package)
@@ -476,7 +476,7 @@ exit('yo');
     /**
      * Remove the config files of the root package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     public function removeRootConfig(PackageInterface $package)
@@ -590,7 +590,7 @@ exit('yo');
     /**
      * Test if documentation files of a package already exists
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function isInstalledDoc(PackageInterface $package)
@@ -613,7 +613,7 @@ exit('yo');
     /**
      * Link the documentation files of a package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function installDoc(PackageInterface $package)
@@ -638,7 +638,7 @@ exit('yo');
     /**
      * Remove the config files of a package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function removeDoc(PackageInterface $package)
@@ -775,7 +775,7 @@ exit('yo');
     /**
      * Test if i18n files of a package already exists
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function isInstalledLanguage(PackageInterface $package)
@@ -798,7 +798,7 @@ exit('yo');
     /**
      * Move the i18n files of a package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function installLanguage(PackageInterface $package)
@@ -823,7 +823,7 @@ exit('yo');
     /**
      * Remove the i18n files of a package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     protected function removeLanguage(PackageInterface $package)
@@ -847,7 +847,7 @@ exit('yo');
     /**
      * Move the i18n files of the root package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     public function installRootLanguage(PackageInterface $package)
@@ -871,7 +871,7 @@ exit('yo');
     /**
      * Remove the i18n files of the root package
      *
-     * @param object $package Composer\Package\PackageInterface
+     * @param \Composer\Package\PackageInterface $package
      * @return bool
      */
     public function removeRootLanguage(PackageInterface $package)
