@@ -14,18 +14,15 @@ namespace CarteBlancheInstaller;
 
 use \RecursiveDirectoryIterator;
 use \RecursiveIteratorIterator;
-
 use \Composer\Composer;
 use \Composer\IO\IOInterface;
 use \Composer\Installer\LibraryInstaller;
 use \Composer\Package\PackageInterface;
 use \Composer\Repository\InstalledRepositoryInterface;
 use \Composer\Script\Event;
-
 use \AssetsManager\Composer\Installer\AssetsInstaller;
 use \AssetsManager\Error;
 use \AssetsManager\Config;
-
 use \CarteBlancheInstaller\BootstrapGenerator;
 use \CarteBlancheInstaller\CarteBlancheConfig;
 use \CarteBlancheInstaller\CarteBlancheAutoloadGenerator;
@@ -127,7 +124,7 @@ exit('yo');
     /**
      * Get the object type by package type: `bundle`, `tool`, `core` or other
      *
-     * @param PackageInterface $package
+     * @param \Composer\Package\PackageInterface $package
      * @return string
      */
     public static function getPackageType(PackageInterface $package)
@@ -498,7 +495,7 @@ exit('yo');
     }
 
     /**
-     * Actually process the config links/files isntallation
+     * Actually process the config links/files installation
      * @param array $config_files
      * @param string $target
      * @return bool
@@ -660,7 +657,7 @@ exit('yo');
     }
 
     /**
-     * Actually process the config links/files isntallation
+     * Actually process the config links/files installation
      * @param array $doc_files
      * @param string $target
      * @return bool
@@ -893,7 +890,7 @@ exit('yo');
     }
 
     /**
-     * Actually process the i18n links/files isntallation
+     * Actually process the i18n links/files installation
      * @param array $i18n_files
      * @param string $target
      * @return bool
@@ -1088,7 +1085,7 @@ exit('yo');
     }
 
     /**
-     * @param PackageInterface $package
+     * @param \Composer\Package\PackageInterface $package
      * @return string
      */
     public static function extractPrefix(PackageInterface $package, $type)
@@ -1097,7 +1094,7 @@ exit('yo');
     }
 
     /**
-     * @param PackageInterface $package
+     * @param \Composer\Package\PackageInterface $package
      * @return string
      */
     public static function extractShortName(PackageInterface $package, $type)

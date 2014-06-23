@@ -19,11 +19,9 @@ use \Composer\Package\PackageInterface;
 use \Composer\Repository\RepositoryInterface;
 use \Composer\Script\Event;
 use \Composer\Script\EventDispatcher;
-
 use \AssetsManager\Error;
 use \AssetsManager\Config;
 use \Assets\Composer\TemplateEngineAutoloadGenerator;
-
 use \CarteBlancheInstaller\BootstrapGenerator;
 use \CarteBlancheInstaller\CarteBlancheConfig;
 use \CarteBlancheInstaller\CarteBlancheInstaller;

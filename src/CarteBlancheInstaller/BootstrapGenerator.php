@@ -19,9 +19,7 @@ use \Composer\Package\PackageInterface;
 use \Composer\Repository\RepositoryInterface;
 use \Composer\Util\Filesystem;
 use \Composer\Script\EventDispatcher;
-
 use \AssetsManager\Config;
-
 use \CarteBlancheInstaller\CarteBlancheInstaller;
 
 /**

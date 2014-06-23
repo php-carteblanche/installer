@@ -20,7 +20,6 @@ use \Composer\Plugin\PluginEvents;
 use \Composer\EventDispatcher\EventSubscriberInterface;
 use \Composer\Plugin\CommandEvent;
 use \Composer\Plugin\PreFileDownloadEvent;
-
 use \CarteBlancheInstaller\CarteBlancheInstaller;
 
 class CarteBlancheInstallerPlugin
