@@ -1,11 +1,10 @@
 <?php
 /**
- * CarteBlanche - PHP framework package - Composer installer package
- * (c) Pierre Cassat and contributors
- * 
- * Sources <http://github.com/php-carteblanche/installer>
+ * This file is part of the CarteBlanche PHP framework.
  *
- * License Apache-2.0
+ * (c) Pierre Cassat <me@e-piwi.fr> and contributors
+ *
+ * License Apache-2.0 <http://github.com/php-carteblanche/carteblanche/blob/master/LICENSE>
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
