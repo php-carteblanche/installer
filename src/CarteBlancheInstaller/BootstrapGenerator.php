@@ -46,6 +46,9 @@ class BootstrapGenerator
         $vendorDir = $this->config->get('vendor-dir');
         $vendorPath = strtr(realpath($vendorDir), '\\', '/');
         $appBasePath = str_replace($vendorDir, '', $vendorPath);
+        if (empty($appBasePath)) {
+            $appBasePath = getcwd();
+        }
         $relVendorPath = $filesystem->findShortestPath(getcwd(), $vendorPath, true);
 
         $bootstrapFile = <<<EOF

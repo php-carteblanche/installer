@@ -112,6 +112,15 @@ exit('yo');
         self::$_instanciatedInstance = $this;
     }
 
+    public function getAppBasePath()
+    {
+        $app_base_path = parent::getAppBasePath();
+        if (empty($app_base_path)) {
+            $app_base_path = getcwd();
+        }
+        return $app_base_path;
+    }
+
     /**
      * Get the current installer instance if it exists
      */
@@ -502,6 +511,7 @@ exit('yo');
     protected function doInstallConfig(array $config_files, $target)
     {
         $app_base_path = rtrim($this->getAppBasePath(), '/') . DIRECTORY_SEPARATOR;
+
         $return = false;
         foreach ($config_files as $config) {
             if (!file_exists($config)) {
