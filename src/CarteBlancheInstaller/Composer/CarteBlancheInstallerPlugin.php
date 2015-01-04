@@ -20,6 +20,7 @@ use \Composer\EventDispatcher\EventSubscriberInterface;
 use \Composer\Plugin\CommandEvent;
 use \Composer\Plugin\PreFileDownloadEvent;
 use \CarteBlancheInstaller\CarteBlancheInstaller;
+use \CarteBlancheInstaller\Composer\Autoload\DumpAutoloadEventHandler;
 
 class CarteBlancheInstallerPlugin
     implements PluginInterface, EventSubscriberInterface

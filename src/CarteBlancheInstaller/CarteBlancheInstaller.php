@@ -54,11 +54,11 @@ class CarteBlancheInstaller
      */
     public static function postAutoloadDump(Event $event)
     {
-        $composer = $event->getComposer();
-        $io = $event->getIO();
-        $package = $composer->getPackage();
+        $composer   = $event->getComposer();
+        $io         = $event->getIO();
+        $package    = $composer->getPackage();
 
-        $_this = new CarteBlancheAutoloadGenerator($package, $composer);
+        $_this      = new CarteBlancheAutoloadGenerator($package, $composer);
 
         $bt = new BootstrapGenerator( $composer, $io );
         if (false!=$bt->generate( $package )) {
@@ -110,6 +110,11 @@ exit('yo');
         $this->filesystem->ensureDirectoryExists(Config::get('var-dir'));
 
         self::$_instanciatedInstance = $this;
+    }
+
+    public function getComposer()
+    {
+        return $this->composer;
     }
 
     public function getAppBasePath()

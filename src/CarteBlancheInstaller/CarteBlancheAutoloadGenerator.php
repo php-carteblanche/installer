@@ -12,18 +12,9 @@
 namespace CarteBlancheInstaller;
 
 use \Composer\Composer;
-use \Composer\IO\IOInterface;
-use \Composer\Autoload\AutoloadGenerator;
 use \Composer\Package\PackageInterface;
-use \Composer\Repository\RepositoryInterface;
-use \Composer\Script\Event;
-use \Composer\Script\EventDispatcher;
-use \AssetsManager\Error;
 use \AssetsManager\Config;
 use \Assets\Composer\TemplateEngineAutoloadGenerator;
-use \CarteBlancheInstaller\BootstrapGenerator;
-use \CarteBlancheInstaller\CarteBlancheConfig;
-use \CarteBlancheInstaller\CarteBlancheInstaller;
 
 /**
  * The framework installer for bundles, tools and Composer events
@@ -37,7 +28,6 @@ class CarteBlancheAutoloadGenerator
     /**
      * @param \Composer\Package\PackageInterface $package
      * @param \Composer\Composer $composer
-     * @return void
      */
     public function __construct(PackageInterface $package, Composer $composer)
     {
@@ -82,12 +72,14 @@ class CarteBlancheAutoloadGenerator
      * @param \Composer\Package\PackageInterface $package
      * @param string $assets_package_dir
      * @param string $vendor_package_dir
-     * @return void
+     * @return array\null
      */
     public function parseComposerExtra(PackageInterface $package, $assets_package_dir, $vendor_package_dir)
     {
         $data = parent::parseComposerExtra($package, $assets_package_dir, $vendor_package_dir);
-        if (is_null($data)) $data = array();
+        if (is_null($data)) {
+            $data = array();
+        }
         if (strlen($vendor_package_dir)) {
             $vendor_package_dir = rtrim($vendor_package_dir, '/');
         }
@@ -122,6 +114,18 @@ class CarteBlancheAutoloadGenerator
                 }
             }
 
+            if ($installer->isPackageContains($package, 'i18n-dir', 'carte-blanche-i18n')) {
+                $files = $installer->getPackageLanguageFiles($package);
+                $base_from = rtrim($installer->getPackageBasePath($package), '/') . DIRECTORY_SEPARATOR
+                    . rtrim($installer->guessConfigurationEntry($package, 'i18n-dir'), '/') . DIRECTORY_SEPARATOR;
+                if (!empty($files)) {
+                    foreach ($files as $i=>$file) {
+                        $files[$i] = str_replace($base_from, '', $file);
+                    }
+                    $data['language_files'] = $files;
+                }
+            }
+
         }
 
         return !empty($data) ? $data : null;
@@ -131,7 +135,7 @@ class CarteBlancheAutoloadGenerator
      * Parse the `composer.json` "extra" block of the root package and return its transformed data
      *
      * @param \Composer\Package\PackageInterface $package
-     * @return void
+     * @return array\null
      */
     public function parseRootComposerExtra(PackageInterface $package)
     {
