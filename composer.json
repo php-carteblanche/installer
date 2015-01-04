@@ -22,6 +22,7 @@
     "scripts": {
         "post-autoload-dump": "\\CarteBlancheInstaller\\CarteBlancheInstaller::postAutoloadDump"
     },
+    "minimum-stability": "dev",
     "extra": {
         "class": "\\CarteBlancheInstaller\\Composer\\CarteBlancheInstallerPlugin",
         "assets-config-class": "\\CarteBlancheInstaller\\CarteBlancheConfig",
